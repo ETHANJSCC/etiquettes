@@ -1,0 +1,32 @@
+appId: fr.wienerberger.etiquettes
+productName: Etiquettes Inventaire
+copyright: Copyright © 2026 Wienerberger France
+
+directories:
+  buildResources: build
+  output: release
+
+# Fichiers embarques dans l'application packagee.
+files:
+  - out/**/*
+  - package.json
+
+# Cible Windows : installeur NSIS + version portable.
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  artifactName: ${productName}-${version}-Setup.${ext}
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Etiquettes Inventaire
+
+# Empeche electron-builder d'essayer de reconstruire des modules natifs
+# (le projet n'en utilise aucun).
+npmRebuild: false
