@@ -160,22 +160,28 @@ npm run build       # typecheck + bundling de production
 
 ## Compilation Windows
 
-Depuis une machine **Windows** (recommandé pour produire l'installeur) :
+Depuis une machine **Windows** :
 
 ```bash
 npm install
 npm run build:win
 ```
 
-Le résultat est généré dans le dossier `release/` :
+Le résultat est un **exécutable unique et portable** dans le dossier `release/` :
 
-- `Etiquettes Inventaire-1.0.0-Setup.exe` — installeur NSIS (choix du dossier,
-  raccourcis bureau et menu Démarrer).
+- `Etiquettes Inventaire-1.0.0.exe` — **aucune installation** : il suffit de
+  double-cliquer pour lancer l'application. Ne nécessite pas de droits
+  administrateur et peut être copié où l'on veut (poste, clé USB, partage
+  réseau).
 
-Pour un test rapide sans installeur (dossier décompressé) :
+Au premier lancement, l'exécutable s'auto-extrait dans un dossier temporaire.
+Les paramètres de calibrage sont conservés dans
+`%APPDATA%\Etiquettes Inventaire\` d'un lancement à l'autre.
+
+Pour obtenir à la place un dossier décompressé (utile en développement) :
 
 ```bash
-npm run build:unpacked   # release/win-unpacked/
+npm run build:unpacked   # release/win-unpacked/ (exe + fichiers annexes)
 ```
 
 > La première compilation télécharge le binaire Electron et les outils de

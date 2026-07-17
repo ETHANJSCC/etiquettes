@@ -11,21 +11,21 @@ files:
   - out/**/*
   - package.json
 
-# Cible Windows : installeur NSIS + version portable.
+# Cible Windows : un unique .exe portable, sans installation.
 win:
   target:
-    - target: nsis
+    - target: portable
       arch:
         - x64
-  artifactName: ${productName}-${version}-Setup.${ext}
+  artifactName: ${productName}-${version}.${ext}
 
-nsis:
-  oneClick: false
-  perMachine: false
-  allowToChangeInstallationDirectory: true
-  createDesktopShortcut: true
-  createStartMenuShortcut: true
-  shortcutName: Etiquettes Inventaire
+# Options de la version portable (un seul executable auto-extractible).
+portable:
+  # Nom du fichier final : "Etiquettes Inventaire-1.0.0.exe".
+  artifactName: ${productName}-${version}.${ext}
+  # Extraction dans un dossier fixe (evite de re-extraire a chaque lancement).
+  unpackDirName: EtiquettesInventaire
+  requestExecutionLevel: user
 
 # Empeche electron-builder d'essayer de reconstruire des modules natifs
 # (le projet n'en utilise aucun).
