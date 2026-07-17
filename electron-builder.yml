@@ -20,11 +20,17 @@ win:
   artifactName: ${productName}-${version}.${ext}
 
 # Options de la version portable (un seul executable auto-extractible).
+#
+# IMPORTANT : ne PAS fixer `unpackDirName` a un nom constant. Un dossier
+# d'extraction fixe et reutilise entre lancements peut rester a moitie
+# extrait si l'utilisateur double-clique une seconde fois pendant que
+# l'extraction est en cours (ou si un antivirus interfere) : tous les
+# lancements suivants reutilisent alors ce dossier corrompu et echouent
+# avec des erreurs du type "ffmpeg.dll introuvable". En laissant
+# electron-builder generer un nom de dossier base sur le contenu/version,
+# chaque nouvelle build repart d'une extraction saine.
 portable:
-  # Nom du fichier final : "Etiquettes Inventaire-1.0.0.exe".
   artifactName: ${productName}-${version}.${ext}
-  # Extraction dans un dossier fixe (evite de re-extraire a chaque lancement).
-  unpackDirName: EtiquettesInventaire
   requestExecutionLevel: user
 
 # Empeche electron-builder d'essayer de reconstruire des modules natifs
