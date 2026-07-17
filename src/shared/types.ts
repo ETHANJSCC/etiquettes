@@ -74,6 +74,7 @@ export interface StoredSettings extends LabelSettings {
 export const IpcChannels = {
   ExportPdf: 'etiquettes:export-pdf',
   ExportWord: 'etiquettes:export-word',
+  OpenInWord: 'etiquettes:open-in-word',
   PrintSheet: 'etiquettes:print-sheet',
   LoadSettings: 'etiquettes:load-settings',
   SaveSettings: 'etiquettes:save-settings'
@@ -111,6 +112,20 @@ export interface ExportWordResult {
   error?: string
 }
 
+/**
+ * Requete d'ouverture dans Word : le document .docx (octets) est ecrit dans un
+ * fichier temporaire puis ouvert avec l'application associee (Word).
+ */
+export interface OpenInWordRequest {
+  data: Uint8Array
+}
+
+/** Resultat d'une ouverture dans Word. */
+export interface OpenInWordResult {
+  ok: boolean
+  error?: string
+}
+
 /** Requete d'impression : le HTML complet de la planche a imprimer. */
 export interface PrintRequest {
   html: string
@@ -133,6 +148,8 @@ export interface EtiquettesApi {
   exportPdf(request: ExportPdfRequest): Promise<ExportPdfResult>
   /** Enregistre le document Word (.docx) fourni. */
   exportWord(request: ExportWordRequest): Promise<ExportWordResult>
+  /** Ouvre le document Word (.docx) fourni dans l'application Word (via un fichier temporaire). */
+  openInWord(request: OpenInWordRequest): Promise<OpenInWordResult>
   /** Ouvre la boite de dialogue d'impression pour la planche fournie (HTML). */
   printSheet(request: PrintRequest): Promise<PrintResult>
   /** Charge les parametres persistes, ou `null` si aucun n'a encore ete enregistre. */

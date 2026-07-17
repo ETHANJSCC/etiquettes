@@ -1,7 +1,7 @@
 import type { LabelContent, LabelSettings } from '../types'
 import { A4_HEIGHT_MM, A4_WIDTH_MM } from './constants'
 import { computeLabelBoxes, isEmptyContent, mm } from './layout'
-import { LABEL_CSS, baseFontMm, renderLabelInner } from './labelTemplate'
+import { LABEL_CSS, renderLabelInner } from './labelTemplate'
 
 /**
  * Construction du document HTML complet d'une planche A4, destine a
@@ -38,7 +38,6 @@ html, body {
  */
 export function buildSheetHtml(contents: LabelContent[], settings: LabelSettings): string {
   const boxes = computeLabelBoxes(settings)
-  const fontSize = baseFontMm(settings.labelHeight)
 
   const labelsHtml = boxes
     .map((box) => {
@@ -48,8 +47,7 @@ export function buildSheetHtml(contents: LabelContent[], settings: LabelSettings
 
       const style =
         `left:${mm(box.x)};top:${mm(box.y)};` +
-        `width:${mm(box.width)};height:${mm(box.height)};` +
-        `font-size:${mm(fontSize)}`
+        `width:${mm(box.width)};height:${mm(box.height)}`
 
       return `<div class="etq-label" style="${style}">${renderLabelInner(content)}</div>`
     })

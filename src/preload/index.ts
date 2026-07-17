@@ -6,6 +6,8 @@ import {
   type ExportPdfResult,
   type ExportWordRequest,
   type ExportWordResult,
+  type OpenInWordRequest,
+  type OpenInWordResult,
   type PrintRequest,
   type PrintResult,
   type StoredSettings
@@ -23,6 +25,9 @@ const api: EtiquettesApi = {
 
   exportWord: (request: ExportWordRequest): Promise<ExportWordResult> =>
     ipcRenderer.invoke(IpcChannels.ExportWord, request),
+
+  openInWord: (request: OpenInWordRequest): Promise<OpenInWordResult> =>
+    ipcRenderer.invoke(IpcChannels.OpenInWord, request),
 
   printSheet: (request: PrintRequest): Promise<PrintResult> =>
     ipcRenderer.invoke(IpcChannels.PrintSheet, request),

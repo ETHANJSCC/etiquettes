@@ -4,11 +4,12 @@ import {
   IpcChannels,
   type ExportPdfRequest,
   type ExportWordRequest,
+  type OpenInWordRequest,
   type PrintRequest,
   type StoredSettings
 } from '@shared/types'
 import { readSettings, writeSettings } from './settingsStore'
-import { exportSheetToPdf, exportWordDocument, printSheet } from './printing'
+import { exportSheetToPdf, exportWordDocument, openInWord, printSheet } from './printing'
 
 /** Reference vers la fenetre principale (utile pour parenter les dialogues). */
 let mainWindow: BrowserWindow | null = null
@@ -63,6 +64,10 @@ function registerIpcHandlers(): void {
 
   ipcMain.handle(IpcChannels.ExportWord, (_event, request: ExportWordRequest) =>
     exportWordDocument(mainWindow, request)
+  )
+
+  ipcMain.handle(IpcChannels.OpenInWord, (_event, request: OpenInWordRequest) =>
+    openInWord(request)
   )
 
   ipcMain.handle(IpcChannels.PrintSheet, (_event, request: PrintRequest) =>

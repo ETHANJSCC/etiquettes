@@ -49,7 +49,9 @@ export const LABEL_CSS = `
   overflow: hidden;
   background: #ffffff;
   color: #000000;
-  font-family: Arial, Helvetica, sans-serif;
+  /* Police et tailles identiques au modele Word d'origine (Calibri, 8/9/11 pt). */
+  font-family: Calibri, "Segoe UI", Carlito, Arial, sans-serif;
+  font-size: 9pt;
   line-height: 1.05;
 }
 .etq-header,
@@ -61,7 +63,7 @@ export const LABEL_CSS = `
   background: #000000;
   color: #ffffff;
   font-weight: 700;
-  font-size: 1.18em;
+  font-size: 11pt;
   text-align: center;
   overflow: hidden;
   white-space: nowrap;
@@ -106,13 +108,13 @@ export const LABEL_CSS = `
 .etq-key {
   flex: 0 0 auto;
   font-weight: 700;
-  font-size: 0.9em;
+  font-size: 8pt;
 }
 .etq-val {
   flex: 1 1 auto;
   min-width: 0;
   font-weight: 700;
-  font-size: 1em;
+  font-size: 9pt;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -149,13 +151,4 @@ function field(key: string, value: string): string {
     `<span class="etq-val">${escapeHtml(value)}</span>` +
     `</div>`
   )
-}
-
-/**
- * Taille de police de base (en mm) d'une etiquette, proportionnelle a sa hauteur.
- * Sert de reference aux tailles exprimees en `em` dans `LABEL_CSS`.
- * (~3,2 mm = 9 pt pour la hauteur d'origine de 29,62 mm.)
- */
-export function baseFontMm(labelHeight: number): number {
-  return labelHeight * 0.108
 }

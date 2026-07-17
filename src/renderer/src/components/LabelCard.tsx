@@ -1,7 +1,7 @@
 import { memo, useMemo } from 'react'
 import type { LabelBox, LabelContent } from '../types'
 import { isEmptyContent, mm } from '../utils/layout'
-import { baseFontMm, renderLabelInner } from '../utils/labelTemplate'
+import { renderLabelInner } from '../utils/labelTemplate'
 
 export interface LabelCardProps {
   /** Position et dimensions de l'etiquette (mm). */
@@ -52,8 +52,7 @@ function LabelCardComponent({ box, content, selected, onToggle }: LabelCardProps
         left: mm(box.x),
         top: mm(box.y),
         width: mm(box.width),
-        height: mm(box.height),
-        fontSize: mm(baseFontMm(box.height))
+        height: mm(box.height)
       }}
     >
       {empty ? (

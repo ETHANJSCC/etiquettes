@@ -62,10 +62,14 @@ depuis la page **Paramètres**.
   sont appliqués simultanément à toutes les étiquettes sélectionnées.
 - **QR code fixe de l'entreprise** (logo « W » Wienerberger, renvoi vers le
   Helpdesk) : strictement identique sur toutes les étiquettes.
+- **Police fidèle au modèle Word** : Calibri, 11 pt (barres), 8 pt (libellés),
+  9 pt (valeurs).
 - **Impression précise** : seules les étiquettes renseignées sont imprimées ;
   toutes les autres positions restent blanches (impression sur feuille entamée).
-  L'impression est forcée à l'échelle 100 % pour un alignement au millimètre.
-- **Export PDF ou Word** (au choix) au format A4 exact.
+- **« Imprimer via Word »** (action principale) : ouvre la planche directement
+  dans Word, pour conserver le flux d'impression habituel (Ctrl+P, choix du
+  support et de l'imprimante).
+- **Export PDF ou Word**, plus une **impression rapide** (sans Word) en option.
 - **Paramètres** : recalibrage des marges, espacements et dimensions, avec
   aperçu en direct. Les réglages sont persistés sur le disque.
 - **Boutons pratiques** : « Sélectionner la prochaine étiquette » (prochaine
@@ -215,11 +219,11 @@ npm run build:unpacked   # release/win-unpacked/ (exe + fichiers annexes)
 Un décalage de quelques millimètres provient presque toujours d'une **mise à
 l'échelle à l'impression**. Pour un alignement parfait :
 
-1. Depuis l'application, le bouton **Imprimer** force déjà l'échelle 100 %.
-2. Si vous imprimez le **PDF** depuis un lecteur (Adobe, Edge…), choisissez
+1. Privilégiez **« Imprimer via Word »** : la planche s'ouvre dans Word et
+   s'imprime à sa taille exacte, sans mise à l'échelle (flux habituel Ctrl+P).
+2. L'**impression rapide** (sans Word) force déjà l'échelle à 100 %.
+3. Si vous imprimez un **PDF** depuis un lecteur (Adobe, Edge…), choisissez
    **« Taille réelle »** / **100 %** (jamais « Ajuster » ou « Réduire »).
-3. L'**export Word** est souvent le plus fidèle : Word imprime le tableau à sa
-   taille exacte, sans mise à l'échelle.
 4. S'il reste un léger décalage propre à une imprimante, ajustez les marges dans
    **Paramètres** (les valeurs sont conservées entre deux sessions).
 ```

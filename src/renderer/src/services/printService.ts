@@ -3,6 +3,7 @@ import type {
   ExportWordResult,
   LabelContent,
   LabelSettings,
+  OpenInWordResult,
   PrintResult
 } from '../types'
 import { buildSheetHtml } from '../utils/sheetHtml'
@@ -52,4 +53,16 @@ export async function exportWord(
 ): Promise<ExportWordResult> {
   const data = await buildWordDocument(contents, settings)
   return window.etiquettes.exportWord({ data, defaultFileName: defaultFileName('docx') })
+}
+
+/**
+ * Genere la planche au format Word et l'ouvre directement dans Word, pret a
+ * imprimer (l'utilisateur conserve son flux habituel : Ctrl+P dans Word).
+ */
+export async function openInWord(
+  contents: LabelContent[],
+  settings: LabelSettings
+): Promise<OpenInWordResult> {
+  const data = await buildWordDocument(contents, settings)
+  return window.etiquettes.openInWord({ data })
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import {
   Button,
+  Divider,
   ListItemIcon,
   ListItemText,
   Menu,
@@ -9,13 +10,15 @@ import {
   Tooltip
 } from '@mui/material'
 import PrintRoundedIcon from '@mui/icons-material/PrintRounded'
-import FileDownloadRoundedIcon from '@mui/icons-material/FileDownloadRounded'
+import MoreHorizRoundedIcon from '@mui/icons-material/MoreHorizRounded'
 import ArrowDropDownRoundedIcon from '@mui/icons-material/ArrowDropDownRounded'
 import PictureAsPdfRoundedIcon from '@mui/icons-material/PictureAsPdfRounded'
 import DescriptionRoundedIcon from '@mui/icons-material/DescriptionRounded'
+import BoltRoundedIcon from '@mui/icons-material/BoltRounded'
 import type { AlertColor } from '@mui/material'
 import type { LabelContent, LabelSettings } from '../types'
-import { exportPdf, exportWord, printSheet } from '../services/printService'
+import { exportPdf, exportWord, openInWord, printSheet } from '../services/printService'
+import { ConfirmDialog } from './ConfirmDialog'
 
 export interface PrintActionsProps {
   /** Contenu de chaque position. */
@@ -29,14 +32,18 @@ export interface PrintActionsProps {
 }
 
 /** Actions en cours, pour l'affichage des indicateurs de chargement. */
-type Busy = 'print' | 'pdf' | 'word' | null
+type Busy = 'word-print' | 'word-save' | 'pdf' | 'print' | null
 
 /**
- * Boutons d'impression et d'export de la planche.
+ * Actions d'impression et d'export de la planche.
  *
- * L'export propose au choix un PDF ou un document Word (.docx). Dans les deux
- * cas, seules les etiquettes renseignees sont incluses ; les positions vides
- * restent blanches, ce qui autorise l'impression sur une feuille entamee.
+ * Action principale : « Imprimer via Word », qui ouvre la planche directement
+ * dans Word pour conserver le flux d'impression habituel (Ctrl+P, choix du
+ * support et de l'imprimante). Les autres options (enregistrer en Word, en PDF,
+ * ou impression rapide) sont accessibles via le menu.
+ *
+ * Dans tous les cas, seules les etiquettes renseignees sont incluses ; les
+ * positions vides restent blanches (impression sur feuille entamee).
  */
 export function PrintActions({
   contents,
@@ -46,106 +53,129 @@ export function PrintActions({
 }: PrintActionsProps): JSX.Element {
   const [busy, setBusy] = useState<Busy>(null)
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null)
+  const [pdfWarningOpen, setPdfWarningOpen] = useState(false)
   const nothingToPrint = filledCount === 0
+  const disabled = nothingToPrint || busy !== null
 
-  const handlePrint = async (): Promise<void> => {
-    setBusy('print')
+  /** Execute une action asynchrone en gerant l'etat occupe et les notifications. */
+  const run = async (
+    kind: Busy,
+    action: () => Promise<{ ok: boolean; canceled?: boolean; error?: string }>,
+    successMessage: string,
+    errorPrefix: string
+  ): Promise<void> => {
+    setBusy(kind)
     try {
-      const result = await printSheet(contents, settings)
-      if (result.ok) onNotify('Impression envoyée à l’imprimante.', 'success')
-      else if (!result.canceled) {
-        onNotify(`Échec de l’impression : ${result.error ?? 'erreur inconnue'}`, 'error')
-      }
+      const result = await action()
+      if (result.ok) onNotify(successMessage, 'success')
+      else if (!result.canceled) onNotify(`${errorPrefix} : ${result.error ?? 'erreur inconnue'}`, 'error')
     } catch (error) {
-      onNotify(`Échec de l’impression : ${asMessage(error)}`, 'error')
+      onNotify(`${errorPrefix} : ${asMessage(error)}`, 'error')
     } finally {
       setBusy(null)
     }
   }
 
-  const handleExportPdf = async (): Promise<void> => {
+  const handleOpenInWord = (): Promise<void> =>
+    run(
+      'word-print',
+      () => openInWord(contents, settings),
+      'Ouverture dans Word… utilisez Ctrl+P pour imprimer.',
+      'Impossible d’ouvrir Word'
+    )
+
+  const handleSaveWord = (): Promise<void> => {
     setMenuAnchor(null)
-    setBusy('pdf')
-    try {
-      const result = await exportPdf(contents, settings)
-      if (result.ok) onNotify('PDF exporté avec succès.', 'success')
-      else if (!result.canceled) {
-        onNotify(`Échec de l’export PDF : ${result.error ?? 'erreur inconnue'}`, 'error')
-      }
-    } catch (error) {
-      onNotify(`Échec de l’export PDF : ${asMessage(error)}`, 'error')
-    } finally {
-      setBusy(null)
-    }
+    return run('word-save', () => exportWord(contents, settings), 'Document Word enregistré.', 'Échec de l’export Word')
   }
 
-  const handleExportWord = async (): Promise<void> => {
+  const handleExportPdf = (): Promise<void> => {
+    setPdfWarningOpen(false)
+    return run('pdf', () => exportPdf(contents, settings), 'PDF enregistré.', 'Échec de l’export PDF')
+  }
+
+  const handleQuickPrint = (): Promise<void> => {
     setMenuAnchor(null)
-    setBusy('word')
-    try {
-      const result = await exportWord(contents, settings)
-      if (result.ok) onNotify('Document Word exporté avec succès.', 'success')
-      else if (!result.canceled) {
-        onNotify(`Échec de l’export Word : ${result.error ?? 'erreur inconnue'}`, 'error')
-      }
-    } catch (error) {
-      onNotify(`Échec de l’export Word : ${asMessage(error)}`, 'error')
-    } finally {
-      setBusy(null)
-    }
+    return run('print', () => printSheet(contents, settings), 'Impression envoyée à l’imprimante.', 'Échec de l’impression')
   }
 
   const tooltip = nothingToPrint ? 'Renseignez au moins une étiquette' : ''
-  const disabled = nothingToPrint || busy !== null
 
   return (
-    <Stack direction="row" spacing={1.25}>
-      <Tooltip title={tooltip}>
-        <span style={{ flex: 1 }}>
-          <Button
-            fullWidth
-            size="large"
-            variant="contained"
-            startIcon={<PrintRoundedIcon />}
-            disabled={disabled}
-            onClick={handlePrint}
-          >
-            Imprimer
-          </Button>
-        </span>
-      </Tooltip>
+    <>
+      <Stack direction="row" spacing={1.25}>
+        <Tooltip title={tooltip}>
+          <span style={{ flex: 1 }}>
+            <Button
+              fullWidth
+              size="large"
+              variant="contained"
+              startIcon={<PrintRoundedIcon />}
+              disabled={disabled}
+              onClick={handleOpenInWord}
+            >
+              Imprimer via Word
+            </Button>
+          </span>
+        </Tooltip>
 
-      <Tooltip title={tooltip}>
-        <span style={{ flex: 1 }}>
-          <Button
-            fullWidth
-            size="large"
-            variant="outlined"
-            startIcon={<FileDownloadRoundedIcon />}
-            endIcon={<ArrowDropDownRoundedIcon />}
-            disabled={disabled}
-            onClick={(e) => setMenuAnchor(e.currentTarget)}
-          >
-            Exporter
-          </Button>
-        </span>
-      </Tooltip>
+        <Tooltip title={tooltip}>
+          <span>
+            <Button
+              size="large"
+              variant="outlined"
+              startIcon={<MoreHorizRoundedIcon />}
+              endIcon={<ArrowDropDownRoundedIcon />}
+              disabled={disabled}
+              onClick={(e) => setMenuAnchor(e.currentTarget)}
+            >
+              Options
+            </Button>
+          </span>
+        </Tooltip>
+      </Stack>
 
       <Menu anchorEl={menuAnchor} open={menuAnchor !== null} onClose={() => setMenuAnchor(null)}>
-        <MenuItem onClick={handleExportPdf}>
-          <ListItemIcon>
-            <PictureAsPdfRoundedIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>Exporter en PDF</ListItemText>
-        </MenuItem>
-        <MenuItem onClick={handleExportWord}>
+        <MenuItem onClick={handleSaveWord}>
           <ListItemIcon>
             <DescriptionRoundedIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>Exporter en Word</ListItemText>
+          <ListItemText>Enregistrer en Word (.docx)</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            setMenuAnchor(null)
+            setPdfWarningOpen(true)
+          }}
+        >
+          <ListItemIcon>
+            <PictureAsPdfRoundedIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Enregistrer en PDF</ListItemText>
+        </MenuItem>
+        <Divider />
+        <MenuItem onClick={handleQuickPrint}>
+          <ListItemIcon>
+            <BoltRoundedIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Impression rapide (sans Word)</ListItemText>
         </MenuItem>
       </Menu>
-    </Stack>
+
+      <ConfirmDialog
+        open={pdfWarningOpen}
+        title="Exporter en PDF ?"
+        message={
+          'À l’impression, les lecteurs PDF réduisent souvent le document à ~96 % ' +
+          '(« Ajuster à la page »), ce qui décale légèrement les étiquettes. ' +
+          'Pensez à imprimer en « Taille réelle / 100 % ». Pour un alignement garanti, ' +
+          'préférez « Imprimer via Word ».'
+        }
+        confirmLabel="Exporter en PDF"
+        onConfirm={handleExportPdf}
+        onCancel={() => setPdfWarningOpen(false)}
+      />
+    </>
   )
 }
 

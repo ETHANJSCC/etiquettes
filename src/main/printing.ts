@@ -1,10 +1,13 @@
-import { BrowserWindow, dialog } from 'electron'
+import { app, BrowserWindow, dialog, shell } from 'electron'
 import { promises as fs } from 'node:fs'
+import { join } from 'node:path'
 import type {
   ExportPdfRequest,
   ExportPdfResult,
   ExportWordRequest,
   ExportWordResult,
+  OpenInWordRequest,
+  OpenInWordResult,
   PrintRequest,
   PrintResult
 } from '@shared/types'
@@ -101,6 +104,27 @@ export async function exportWordDocument(
   try {
     await fs.writeFile(save.filePath, request.data)
     return { ok: true, filePath: save.filePath }
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : String(error) }
+  }
+}
+
+/**
+ * Ecrit le document Word fourni dans un fichier temporaire puis l'ouvre avec
+ * l'application associee (Word). L'utilisateur retrouve ainsi son flux habituel
+ * (Ctrl+P dans Word) pour imprimer, avec le choix du support et de l'imprimante.
+ */
+export async function openInWord(request: OpenInWordRequest): Promise<OpenInWordResult> {
+  try {
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-')
+    const filePath = join(app.getPath('temp'), `Etiquettes-${stamp}.docx`)
+    await fs.writeFile(filePath, request.data)
+
+    const errorMessage = await shell.openPath(filePath)
+    if (errorMessage) {
+      return { ok: false, error: errorMessage }
+    }
+    return { ok: true }
   } catch (error) {
     return { ok: false, error: error instanceof Error ? error.message : String(error) }
   }

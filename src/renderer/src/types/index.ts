@@ -13,6 +13,8 @@ export type {
   ExportPdfResult,
   ExportWordRequest,
   ExportWordResult,
+  OpenInWordRequest,
+  OpenInWordResult,
   PrintRequest,
   PrintResult,
   EtiquettesApi
