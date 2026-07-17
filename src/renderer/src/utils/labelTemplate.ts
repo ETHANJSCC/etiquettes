@@ -1,7 +1,6 @@
 import type { LabelContent } from '../types'
 import { LABEL_TEXTS } from './constants'
-import { buildQrPayload } from './layout'
-import { generateQrSvg } from './qrcode'
+import { QR_IMAGE_DATA_URL } from './qrImage'
 
 /**
  * Gabarit unique d'une etiquette.
@@ -82,10 +81,12 @@ export const LABEL_CSS = `
   align-items: center;
   justify-content: center;
 }
-.etq-qr svg {
+.etq-qr img {
   width: 100%;
   height: 100%;
   display: block;
+  object-fit: contain;
+  image-rendering: pixelated;
 }
 .etq-fields {
   flex: 1 1 auto;
@@ -124,13 +125,11 @@ export const LABEL_CSS = `
  * @returns Fragment HTML a inserer dans un conteneur `.etq-label`.
  */
 export function renderLabelInner(content: LabelContent): string {
-  const qrSvg = generateQrSvg(buildQrPayload(content))
-
   return (
     `<div class="etq-inner">` +
     `<div class="etq-header">${escapeHtml(LABEL_TEXTS.brand)}</div>` +
     `<div class="etq-body">` +
-    `<div class="etq-qr">${qrSvg}</div>` +
+    `<div class="etq-qr"><img src="${QR_IMAGE_DATA_URL}" alt="QR Helpdesk" /></div>` +
     `<div class="etq-fields">` +
     field(LABEL_TEXTS.nameLabel, content.name) +
     field(LABEL_TEXTS.modelLabel, content.model) +

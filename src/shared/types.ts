@@ -57,6 +57,15 @@ export interface LabelData {
   content: LabelContent
 }
 
+/**
+ * Parametres tels qu'ecrits sur le disque : les reglages geometriques plus un
+ * numero de version de schema permettant d'ignorer une ancienne calibration
+ * devenue incorrecte.
+ */
+export interface StoredSettings extends LabelSettings {
+  version: number
+}
+
 /* --------------------------------------------------------------------------
  * Contrat IPC (renderer <-> main)
  * ------------------------------------------------------------------------ */
@@ -64,6 +73,7 @@ export interface LabelData {
 /** Noms de canaux IPC, centralises pour eviter les chaines magiques. */
 export const IpcChannels = {
   ExportPdf: 'etiquettes:export-pdf',
+  ExportWord: 'etiquettes:export-word',
   PrintSheet: 'etiquettes:print-sheet',
   LoadSettings: 'etiquettes:load-settings',
   SaveSettings: 'etiquettes:save-settings'
@@ -83,6 +93,21 @@ export interface ExportPdfResult {
   /** Chemin du fichier PDF ecrit en cas de succes. */
   filePath?: string
   /** Message d'erreur eventuel. */
+  error?: string
+}
+
+/** Requete d'export Word : le document .docx deja genere (octets) et un nom propose. */
+export interface ExportWordRequest {
+  /** Contenu binaire du fichier .docx. */
+  data: Uint8Array
+  defaultFileName: string
+}
+
+/** Resultat d'un export Word (meme forme que l'export PDF). */
+export interface ExportWordResult {
+  ok: boolean
+  canceled?: boolean
+  filePath?: string
   error?: string
 }
 
@@ -106,10 +131,12 @@ export interface PrintResult {
 export interface EtiquettesApi {
   /** Exporte la planche fournie (HTML) en PDF A4 exact. */
   exportPdf(request: ExportPdfRequest): Promise<ExportPdfResult>
+  /** Enregistre le document Word (.docx) fourni. */
+  exportWord(request: ExportWordRequest): Promise<ExportWordResult>
   /** Ouvre la boite de dialogue d'impression pour la planche fournie (HTML). */
   printSheet(request: PrintRequest): Promise<PrintResult>
   /** Charge les parametres persistes, ou `null` si aucun n'a encore ete enregistre. */
-  loadSettings(): Promise<LabelSettings | null>
+  loadSettings(): Promise<StoredSettings | null>
   /** Enregistre les parametres de facon persistante. */
-  saveSettings(settings: LabelSettings): Promise<void>
+  saveSettings(settings: StoredSettings): Promise<void>
 }

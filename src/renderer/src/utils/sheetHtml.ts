@@ -15,7 +15,7 @@ import { LABEL_CSS, baseFontMm, renderLabelInner } from './labelTemplate'
 /** Styles de la feuille A4 elle-meme (page, positionnement absolu des etiquettes). */
 const SHEET_CSS = `
 * { margin: 0; padding: 0; box-sizing: border-box; }
-@page { size: A4; margin: 0; }
+@page { size: ${A4_WIDTH_MM}mm ${A4_HEIGHT_MM}mm; margin: 0; }
 html, body {
   width: ${A4_WIDTH_MM}mm;
   height: ${A4_HEIGHT_MM}mm;

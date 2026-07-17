@@ -1,5 +1,12 @@
-import type { ExportPdfResult, LabelContent, LabelSettings, PrintResult } from '../types'
+import type {
+  ExportPdfResult,
+  ExportWordResult,
+  LabelContent,
+  LabelSettings,
+  PrintResult
+} from '../types'
 import { buildSheetHtml } from '../utils/sheetHtml'
+import { buildWordDocument } from '../utils/wordDocument'
 
 /**
  * Service d'impression et d'export PDF.
@@ -9,15 +16,15 @@ import { buildSheetHtml } from '../utils/sheetHtml'
  * effective, seule capable de produire une sortie A4 au millimetre.
  */
 
-/** Nom de fichier PDF propose par defaut, horodate. */
-function defaultPdfName(): string {
+/** Nom de fichier horodate pour l'export, avec l'extension demandee. */
+function defaultFileName(extension: string): string {
   const now = new Date()
   const stamp = [
     now.getFullYear(),
     String(now.getMonth() + 1).padStart(2, '0'),
     String(now.getDate()).padStart(2, '0')
   ].join('-')
-  return `etiquettes-${stamp}.pdf`
+  return `etiquettes-${stamp}.${extension}`
 }
 
 /** Imprime la planche : ouvre la boite de dialogue d'impression du systeme. */
@@ -35,5 +42,14 @@ export async function exportPdf(
   settings: LabelSettings
 ): Promise<ExportPdfResult> {
   const html = buildSheetHtml(contents, settings)
-  return window.etiquettes.exportPdf({ html, defaultFileName: defaultPdfName() })
+  return window.etiquettes.exportPdf({ html, defaultFileName: defaultFileName('pdf') })
+}
+
+/** Exporte la planche en document Word (.docx) : ouvre « Enregistrer sous ». */
+export async function exportWord(
+  contents: LabelContent[],
+  settings: LabelSettings
+): Promise<ExportWordResult> {
+  const data = await buildWordDocument(contents, settings)
+  return window.etiquettes.exportWord({ data, defaultFileName: defaultFileName('docx') })
 }

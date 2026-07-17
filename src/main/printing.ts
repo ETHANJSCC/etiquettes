@@ -3,6 +3,8 @@ import { promises as fs } from 'node:fs'
 import type {
   ExportPdfRequest,
   ExportPdfResult,
+  ExportWordRequest,
+  ExportWordResult,
   PrintRequest,
   PrintResult
 } from '@shared/types'
@@ -76,8 +78,40 @@ export async function exportSheetToPdf(
 }
 
 /**
+ * Enregistre le document Word (.docx) fourni via une boite de dialogue
+ * « Enregistrer sous ».
+ */
+export async function exportWordDocument(
+  parent: BrowserWindow | null,
+  request: ExportWordRequest
+): Promise<ExportWordResult> {
+  const saveOptions = {
+    title: 'Exporter la planche en Word',
+    defaultPath: request.defaultFileName,
+    filters: [{ name: 'Document Word', extensions: ['docx'] }]
+  }
+  const save = parent
+    ? await dialog.showSaveDialog(parent, saveOptions)
+    : await dialog.showSaveDialog(saveOptions)
+
+  if (save.canceled || !save.filePath) {
+    return { ok: false, canceled: true }
+  }
+
+  try {
+    await fs.writeFile(save.filePath, request.data)
+    return { ok: true, filePath: save.filePath }
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : String(error) }
+  }
+}
+
+/**
  * Ouvre la boite de dialogue d'impression du systeme pour la planche fournie.
  * Les positions vides restent totalement blanches (impression sur feuille entamee).
+ *
+ * L'echelle est forcee a 100 % pour garantir un alignement au millimetre :
+ * toute mise a l'echelle (« ajuster a la page ») decalerait l'impression.
  */
 export async function printSheet(request: PrintRequest): Promise<PrintResult> {
   let win: BrowserWindow | null = null
@@ -89,6 +123,8 @@ export async function printSheet(request: PrintRequest): Promise<PrintResult> {
         {
           silent: false,
           printBackground: true,
+          scaleFactor: 100,
+          pageSize: 'A4',
           margins: { marginType: 'none' }
         },
         (success, failureReason) => {

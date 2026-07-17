@@ -4,9 +4,11 @@ import {
   type EtiquettesApi,
   type ExportPdfRequest,
   type ExportPdfResult,
-  type LabelSettings,
+  type ExportWordRequest,
+  type ExportWordResult,
   type PrintRequest,
-  type PrintResult
+  type PrintResult,
+  type StoredSettings
 } from '@shared/types'
 
 /**
@@ -19,13 +21,16 @@ const api: EtiquettesApi = {
   exportPdf: (request: ExportPdfRequest): Promise<ExportPdfResult> =>
     ipcRenderer.invoke(IpcChannels.ExportPdf, request),
 
+  exportWord: (request: ExportWordRequest): Promise<ExportWordResult> =>
+    ipcRenderer.invoke(IpcChannels.ExportWord, request),
+
   printSheet: (request: PrintRequest): Promise<PrintResult> =>
     ipcRenderer.invoke(IpcChannels.PrintSheet, request),
 
-  loadSettings: (): Promise<LabelSettings | null> =>
+  loadSettings: (): Promise<StoredSettings | null> =>
     ipcRenderer.invoke(IpcChannels.LoadSettings),
 
-  saveSettings: (settings: LabelSettings): Promise<void> =>
+  saveSettings: (settings: StoredSettings): Promise<void> =>
     ipcRenderer.invoke(IpcChannels.SaveSettings, settings)
 }
 

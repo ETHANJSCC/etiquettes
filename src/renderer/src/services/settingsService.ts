@@ -1,5 +1,5 @@
-import type { LabelSettings } from '../types'
-import { DEFAULT_SETTINGS } from '../utils/constants'
+import type { LabelSettings, StoredSettings } from '../types'
+import { DEFAULT_SETTINGS, SETTINGS_VERSION } from '../utils/constants'
 
 /**
  * Service de gestion des parametres.
@@ -38,13 +38,23 @@ export function normalizeSettings(partial: Partial<LabelSettings> | null | undef
   return merged
 }
 
-/** Charge les parametres persistes (ou les valeurs par defaut si aucun). */
+/**
+ * Charge les parametres persistes (ou les valeurs par defaut).
+ *
+ * Si les reglages enregistres proviennent d'une version anterieure du schema
+ * (calibration potentiellement incorrecte), ils sont ignores au profit des
+ * valeurs par defaut a jour.
+ */
 export async function loadSettings(): Promise<LabelSettings> {
   const stored = await window.etiquettes.loadSettings()
+  if (!stored || stored.version !== SETTINGS_VERSION) {
+    return { ...DEFAULT_SETTINGS }
+  }
   return normalizeSettings(stored)
 }
 
-/** Enregistre les parametres de facon persistante. */
+/** Enregistre les parametres de facon persistante (avec la version courante). */
 export async function saveSettings(settings: LabelSettings): Promise<void> {
-  await window.etiquettes.saveSettings(normalizeSettings(settings))
+  const stored: StoredSettings = { ...normalizeSettings(settings), version: SETTINGS_VERSION }
+  await window.etiquettes.saveSettings(stored)
 }

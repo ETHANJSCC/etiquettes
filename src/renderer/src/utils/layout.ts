@@ -42,20 +42,6 @@ export function isEmptyContent(content: LabelContent): boolean {
   return !content.name.trim() && !content.model.trim() && !content.serial.trim()
 }
 
-/**
- * Construit la chaine encodee dans le QR code d'une etiquette.
- * Regroupe les informations principales de la machine pour un scan rapide
- * par le support informatique.
- */
-export function buildQrPayload(content: LabelContent): string {
-  const lines = [
-    content.name.trim() && `Nom: ${content.name.trim()}`,
-    content.model.trim() && `Modele: ${content.model.trim()}`,
-    content.serial.trim() && `S/N: ${content.serial.trim()}`
-  ].filter(Boolean)
-  return lines.join('\n')
-}
-
 /** Formate un nombre en millimetres pour l'affichage CSS (evite les longues decimales). */
 export function mm(value: number): string {
   return `${Number(value.toFixed(3))}mm`

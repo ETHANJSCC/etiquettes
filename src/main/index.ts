@@ -3,11 +3,12 @@ import { join } from 'node:path'
 import {
   IpcChannels,
   type ExportPdfRequest,
-  type LabelSettings,
-  type PrintRequest
+  type ExportWordRequest,
+  type PrintRequest,
+  type StoredSettings
 } from '@shared/types'
 import { readSettings, writeSettings } from './settingsStore'
-import { exportSheetToPdf, printSheet } from './printing'
+import { exportSheetToPdf, exportWordDocument, printSheet } from './printing'
 
 /** Reference vers la fenetre principale (utile pour parenter les dialogues). */
 let mainWindow: BrowserWindow | null = null
@@ -52,12 +53,16 @@ function createWindow(): void {
 function registerIpcHandlers(): void {
   ipcMain.handle(IpcChannels.LoadSettings, () => readSettings())
 
-  ipcMain.handle(IpcChannels.SaveSettings, (_event, settings: LabelSettings) =>
+  ipcMain.handle(IpcChannels.SaveSettings, (_event, settings: StoredSettings) =>
     writeSettings(settings)
   )
 
   ipcMain.handle(IpcChannels.ExportPdf, (_event, request: ExportPdfRequest) =>
     exportSheetToPdf(mainWindow, request)
+  )
+
+  ipcMain.handle(IpcChannels.ExportWord, (_event, request: ExportWordRequest) =>
+    exportWordDocument(mainWindow, request)
   )
 
   ipcMain.handle(IpcChannels.PrintSheet, (_event, request: PrintRequest) =>

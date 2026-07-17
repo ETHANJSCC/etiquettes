@@ -7,9 +7,12 @@
 export type {
   LabelContent,
   LabelSettings,
+  StoredSettings,
   LabelData,
   ExportPdfRequest,
   ExportPdfResult,
+  ExportWordRequest,
+  ExportWordResult,
   PrintRequest,
   PrintResult,
   EtiquettesApi

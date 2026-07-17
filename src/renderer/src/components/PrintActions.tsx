@@ -1,10 +1,21 @@
 import { useState } from 'react'
-import { Button, Stack, Tooltip } from '@mui/material'
+import {
+  Button,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Stack,
+  Tooltip
+} from '@mui/material'
 import PrintRoundedIcon from '@mui/icons-material/PrintRounded'
+import FileDownloadRoundedIcon from '@mui/icons-material/FileDownloadRounded'
+import ArrowDropDownRoundedIcon from '@mui/icons-material/ArrowDropDownRounded'
 import PictureAsPdfRoundedIcon from '@mui/icons-material/PictureAsPdfRounded'
+import DescriptionRoundedIcon from '@mui/icons-material/DescriptionRounded'
 import type { AlertColor } from '@mui/material'
 import type { LabelContent, LabelSettings } from '../types'
-import { exportPdf, printSheet } from '../services/printService'
+import { exportPdf, exportWord, printSheet } from '../services/printService'
 
 export interface PrintActionsProps {
   /** Contenu de chaque position. */
@@ -18,13 +29,14 @@ export interface PrintActionsProps {
 }
 
 /** Actions en cours, pour l'affichage des indicateurs de chargement. */
-type Busy = 'print' | 'pdf' | null
+type Busy = 'print' | 'pdf' | 'word' | null
 
 /**
- * Boutons d'impression et d'export PDF de la planche.
+ * Boutons d'impression et d'export de la planche.
  *
- * Seules les etiquettes renseignees sont imprimees / exportees ; les positions
- * vides restent blanches, ce qui autorise l'impression sur une feuille entamee.
+ * L'export propose au choix un PDF ou un document Word (.docx). Dans les deux
+ * cas, seules les etiquettes renseignees sont incluses ; les positions vides
+ * restent blanches, ce qui autorise l'impression sur une feuille entamee.
  */
 export function PrintActions({
   contents,
@@ -33,6 +45,7 @@ export function PrintActions({
   onNotify
 }: PrintActionsProps): JSX.Element {
   const [busy, setBusy] = useState<Busy>(null)
+  const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null)
   const nothingToPrint = filledCount === 0
 
   const handlePrint = async (): Promise<void> => {
@@ -50,7 +63,8 @@ export function PrintActions({
     }
   }
 
-  const handleExport = async (): Promise<void> => {
+  const handleExportPdf = async (): Promise<void> => {
+    setMenuAnchor(null)
     setBusy('pdf')
     try {
       const result = await exportPdf(contents, settings)
@@ -65,7 +79,24 @@ export function PrintActions({
     }
   }
 
+  const handleExportWord = async (): Promise<void> => {
+    setMenuAnchor(null)
+    setBusy('word')
+    try {
+      const result = await exportWord(contents, settings)
+      if (result.ok) onNotify('Document Word exporté avec succès.', 'success')
+      else if (!result.canceled) {
+        onNotify(`Échec de l’export Word : ${result.error ?? 'erreur inconnue'}`, 'error')
+      }
+    } catch (error) {
+      onNotify(`Échec de l’export Word : ${asMessage(error)}`, 'error')
+    } finally {
+      setBusy(null)
+    }
+  }
+
   const tooltip = nothingToPrint ? 'Renseignez au moins une étiquette' : ''
+  const disabled = nothingToPrint || busy !== null
 
   return (
     <Stack direction="row" spacing={1.25}>
@@ -76,27 +107,44 @@ export function PrintActions({
             size="large"
             variant="contained"
             startIcon={<PrintRoundedIcon />}
-            disabled={nothingToPrint || busy !== null}
+            disabled={disabled}
             onClick={handlePrint}
           >
             Imprimer
           </Button>
         </span>
       </Tooltip>
+
       <Tooltip title={tooltip}>
         <span style={{ flex: 1 }}>
           <Button
             fullWidth
             size="large"
             variant="outlined"
-            startIcon={<PictureAsPdfRoundedIcon />}
-            disabled={nothingToPrint || busy !== null}
-            onClick={handleExport}
+            startIcon={<FileDownloadRoundedIcon />}
+            endIcon={<ArrowDropDownRoundedIcon />}
+            disabled={disabled}
+            onClick={(e) => setMenuAnchor(e.currentTarget)}
           >
-            Exporter en PDF
+            Exporter
           </Button>
         </span>
       </Tooltip>
+
+      <Menu anchorEl={menuAnchor} open={menuAnchor !== null} onClose={() => setMenuAnchor(null)}>
+        <MenuItem onClick={handleExportPdf}>
+          <ListItemIcon>
+            <PictureAsPdfRoundedIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Exporter en PDF</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={handleExportWord}>
+          <ListItemIcon>
+            <DescriptionRoundedIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Exporter en Word</ListItemText>
+        </MenuItem>
+      </Menu>
     </Stack>
   )
 }

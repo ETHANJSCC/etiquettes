@@ -1,7 +1,7 @@
 import { app } from 'electron'
 import { promises as fs } from 'node:fs'
 import { join } from 'node:path'
-import type { LabelSettings } from '@shared/types'
+import type { StoredSettings } from '@shared/types'
 
 /**
  * Persistance simple des parametres sous forme de fichier JSON dans le
@@ -17,17 +17,17 @@ function settingsFilePath(): string {
 }
 
 /** Lit les parametres persistes, ou `null` si le fichier n'existe pas / est illisible. */
-export async function readSettings(): Promise<LabelSettings | null> {
+export async function readSettings(): Promise<StoredSettings | null> {
   try {
     const raw = await fs.readFile(settingsFilePath(), 'utf-8')
-    return JSON.parse(raw) as LabelSettings
+    return JSON.parse(raw) as StoredSettings
   } catch {
     return null
   }
 }
 
 /** Ecrit les parametres sur le disque (creation ou remplacement). */
-export async function writeSettings(settings: LabelSettings): Promise<void> {
+export async function writeSettings(settings: StoredSettings): Promise<void> {
   const path = settingsFilePath()
   await fs.writeFile(path, JSON.stringify(settings, null, 2), 'utf-8')
 }

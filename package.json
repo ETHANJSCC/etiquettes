@@ -16,7 +16,7 @@
     "build:unpacked": "npm run build && electron-builder --dir --config electron-builder.yml"
   },
   "dependencies": {
-    "qrcode-generator": "^2.0.4"
+    "docx": "^9.1.1"
   },
   "devDependencies": {
     "@emotion/react": "^11.13.5",

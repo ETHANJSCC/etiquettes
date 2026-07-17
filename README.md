@@ -25,25 +25,26 @@ positions non renseignées restent totalement vides.
 
 ## Analyse du modèle Word
 
-La disposition a été extraite automatiquement du modèle `ETIQUETTES.docx`
-fourni (conversion : 1 pouce = 1440 twips = 25,4 mm) et reproduite fidèlement.
+La mise en page reproduit la planche **Avery L6011 / LP27/63** (référence
+officielle des feuilles utilisées), pour un alignement au plus juste.
 
-| Élément                     | Valeur relevée         | En millimètres |
-| --------------------------- | ---------------------- | -------------- |
-| Format de page              | 11905 × 16837 twips    | 210 × 297 (A4) |
-| Grille                      | 3 colonnes × 9 rangées | **27 étiquettes / feuille** |
-| Largeur d'une étiquette     | 3600 twips             | 63,50 mm       |
-| Hauteur d'une étiquette     | 1679 twips             | 29,62 mm       |
-| Espacement horizontal       | 144 twips              | 2,54 mm        |
-| Espacement vertical         | 0                      | 0 mm (rangées jointives) |
-| Marge haute                 | 856 twips              | 15,10 mm       |
-| Marges gauche / droite      | 408 twips (retrait −15)| ≈ 6,9 / 7,2 mm |
+| Élément                     | Valeur exacte (Avery L6011) |
+| --------------------------- | --------------------------- |
+| Format de page              | 210 × 297 mm (A4)           |
+| Grille                      | 3 colonnes × 9 rangées — **27 étiquettes / feuille** |
+| Étiquette                   | 63,5 × 29,6 mm              |
+| Espacement horizontal       | 2,5 mm (pas de 66,0 mm)     |
+| Espacement vertical         | 0 mm (rangées jointives, pas de 29,6 mm) |
+| Marges haute / basse        | 15,3 mm                     |
+| Marges gauche / droite      | 7,25 mm                     |
 
-**Mise en page d'une étiquette** (identique au modèle) :
+> Contrôle : 7,25 + 3×63,5 + 2×2,5 + 7,25 = 210 mm ; 15,3 + 9×29,6 + 15,3 = 297 mm.
+
+**Mise en page d'une étiquette** (identique au modèle Word) :
 
 - barre noire supérieure : « wienerberger France » (blanc, gras, centré) ;
-- corps : QR code (avec le logo « W » Wienerberger) à gauche, puis trois lignes
-  `Nom :`, `Modèle :`, `S/N :` à droite ;
+- corps : QR code fixe (logo « W » Wienerberger, identique sur toutes les
+  étiquettes) à gauche, puis trois lignes `Nom :`, `Modèle :`, `S/N :` à droite ;
 - barre noire inférieure : « Helpdesk - Scannez moi ».
 
 Ces valeurs constituent les paramètres par défaut ; elles restent recalibrables
@@ -59,10 +60,12 @@ depuis la page **Paramètres**.
   plusieurs étiquettes, mises en évidence visuellement.
 - **Saisie appliquée en direct** : les champs Nom, Modèle et Numéro de série
   sont appliqués simultanément à toutes les étiquettes sélectionnées.
-- **QR code généré automatiquement** encodant les informations de la machine.
+- **QR code fixe de l'entreprise** (logo « W » Wienerberger, renvoi vers le
+  Helpdesk) : strictement identique sur toutes les étiquettes.
 - **Impression précise** : seules les étiquettes renseignées sont imprimées ;
   toutes les autres positions restent blanches (impression sur feuille entamée).
-- **Export PDF** au format A4 exact.
+  L'impression est forcée à l'échelle 100 % pour un alignement au millimètre.
+- **Export PDF ou Word** (au choix) au format A4 exact.
 - **Paramètres** : recalibrage des marges, espacements et dimensions, avec
   aperçu en direct. Les réglages sont persistés sur le disque.
 - **Boutons pratiques** : « Sélectionner la prochaine étiquette » (prochaine
@@ -78,9 +81,9 @@ depuis la page **Paramètres**.
 - [Vite](https://vitejs.dev/) via [electron-vite](https://electron-vite.org/)
 - [Material UI](https://mui.com/) — interface sobre et professionnelle
 - [electron-builder](https://www.electron.build/) — packaging Windows
-- [qrcode-generator](https://www.npmjs.com/package/qrcode-generator) — QR codes hors ligne
+- [docx](https://www.npmjs.com/package/docx) — génération des documents Word
 
-Aucun accès réseau n'est requis à l'exécution : tout est embarqué.
+Aucun accès réseau n'est requis à l'exécution : tout est embarqué (QR compris).
 
 ---
 
@@ -90,7 +93,7 @@ Aucun accès réseau n'est requis à l'exécution : tout est embarqué.
 src/
 ├── main/                  Processus principal Electron
 │   ├── index.ts             Fenêtre + enregistrement des canaux IPC
-│   ├── printing.ts          Impression et export PDF (printToPDF)
+│   ├── printing.ts          Impression, export PDF (printToPDF) et sauvegarde Word
 │   └── settingsStore.ts     Persistance des paramètres (JSON userData)
 ├── preload/               Pont sécurisé (contextBridge)
 │   ├── index.ts             Expose window.etiquettes
@@ -104,7 +107,7 @@ src/
         │   ├── LabelSheet.tsx       Planche A4 mise à l'échelle
         │   ├── LabelForm.tsx        Formulaire de saisie
         │   ├── SelectionToolbar.tsx Actions de sélection
-        │   ├── PrintActions.tsx     Boutons Imprimer / Exporter PDF
+        │   ├── PrintActions.tsx     Boutons Imprimer / Exporter (PDF ou Word)
         │   ├── NumberField.tsx      Champ numérique (mm)
         │   ├── ConfirmDialog.tsx    Dialogue de confirmation
         │   └── AppLayout.tsx        Ossature + navigation
@@ -117,15 +120,16 @@ src/
         │   ├── useElementSize.ts    Mesure d'élément (mise à l'échelle)
         │   └── useAppContext.ts     Contexte applicatif (routeur)
         ├── services/        Accès aux fonctions du processus principal
-        │   ├── printService.ts      Construction HTML + impression / PDF
-        │   └── settingsService.ts   Normalisation + persistance
+        │   ├── printService.ts      Construction HTML/Word + impression / export
+        │   └── settingsService.ts   Normalisation, versionnage + persistance
         ├── types/           Types du renderer (réexporte le domaine)
         ├── utils/           Fonctions pures
-        │   ├── constants.ts         Valeurs par défaut (issues du modèle Word)
+        │   ├── constants.ts         Valeurs par défaut (Avery L6011)
         │   ├── layout.ts            Calcul des positions (mm)
-        │   ├── qrcode.ts            Génération SVG du QR code
+        │   ├── qrImage.ts           QR fixe de l'entreprise (image embarquée)
         │   ├── labelTemplate.ts     Gabarit UNIQUE d'une étiquette (aperçu + impression)
-        │   └── sheetHtml.ts         Construction du HTML A4 imprimable
+        │   ├── sheetHtml.ts         Construction du HTML A4 imprimable
+        │   └── wordDocument.ts      Génération du document Word (.docx)
         ├── App.tsx          Composant racine (thème, routeur, état global)
         ├── theme.ts         Thème Material UI
         └── main.tsx         Point d'entrée du renderer
@@ -191,18 +195,31 @@ npm run build:unpacked   # release/win-unpacked/ (exe + fichiers annexes)
 
 ## Notes de conception
 
-- **Précision d'impression** : le HTML de la planche est dimensionné en
-  millimètres avec `@page { size: A4; margin: 0 }`. L'impression et l'export PDF
-  passent par une fenêtre masquée dédiée dans le processus principal
-  (`webContents.printToPDF` / `webContents.print`), garantissant une sortie A4
-  au millimètre, indépendante de l'affichage.
-- **Impression sur feuille entamée** : `buildSheetHtml` ne génère que les
-  étiquettes renseignées ; les autres positions n'existent pas dans le document
-  imprimé et restent parfaitement blanches.
+- **Précision d'impression** : la géométrie par défaut correspond à la
+  spécification officielle Avery L6011. Le HTML de la planche est dimensionné en
+  millimètres avec `@page { size: 210mm 297mm; margin: 0 }`, et l'impression est
+  forcée à l'échelle 100 %. L'impression et l'export PDF passent par une fenêtre
+  masquée dédiée dans le processus principal (`webContents.printToPDF` /
+  `webContents.print`), pour une sortie A4 au millimètre.
+- **Impression sur feuille entamée** : seules les étiquettes renseignées sont
+  générées ; les autres positions restent parfaitement blanches (aussi bien en
+  PDF qu'en Word).
+- **QR fixe** : le QR de l'entreprise est embarqué en image (base64) et réutilisé
+  à l'identique sur chaque étiquette — il ne dépend pas du contenu saisi.
 - **Sécurité** : `contextIsolation` activé, `nodeIntegration` désactivé, aucune
   ressource distante. La seule surface exposée au renderer est l'API typée
-  `window.etiquettes` (impression, PDF, paramètres).
-- **Recalibrage** : si l'impression est légèrement décalée sur une imprimante
-  donnée, ajustez les marges / dimensions dans **Paramètres** ; les valeurs sont
-  conservées entre deux sessions.
+  `window.etiquettes` (impression, PDF, Word, paramètres).
+
+### Impression au plus juste
+
+Un décalage de quelques millimètres provient presque toujours d'une **mise à
+l'échelle à l'impression**. Pour un alignement parfait :
+
+1. Depuis l'application, le bouton **Imprimer** force déjà l'échelle 100 %.
+2. Si vous imprimez le **PDF** depuis un lecteur (Adobe, Edge…), choisissez
+   **« Taille réelle »** / **100 %** (jamais « Ajuster » ou « Réduire »).
+3. L'**export Word** est souvent le plus fidèle : Word imprime le tableau à sa
+   taille exacte, sans mise à l'échelle.
+4. S'il reste un léger décalage propre à une imprimante, ajustez les marges dans
+   **Paramètres** (les valeurs sont conservées entre deux sessions).
 ```
