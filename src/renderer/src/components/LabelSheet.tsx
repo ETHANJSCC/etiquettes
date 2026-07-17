@@ -14,8 +14,8 @@ export interface LabelSheetProps {
   settings: LabelSettings
   /** Ensemble des index selectionnes. */
   selection: Selection
-  /** Bascule la selection d'une etiquette. */
-  onToggle: (index: number) => void
+  /** Selectionne une etiquette (`additive` = Ctrl/Cmd enfonce : ajout/retrait). */
+  onSelect: (index: number, additive: boolean) => void
 }
 
 /** Conversion CSS de reference : 1 mm = 96 / 25,4 px. */
@@ -56,7 +56,7 @@ export function LabelSheet({
   contents,
   settings,
   selection,
-  onToggle
+  onSelect
 }: LabelSheetProps): JSX.Element {
   const { ref, width } = useElementSize()
   // Les positions ne dependent que des parametres : on evite de les recalculer
@@ -91,7 +91,7 @@ export function LabelSheet({
                 box={box}
                 content={contents[box.index]}
                 selected={selection.has(box.index)}
-                onToggle={onToggle}
+                onSelect={onSelect}
               />
             ))}
           </div>

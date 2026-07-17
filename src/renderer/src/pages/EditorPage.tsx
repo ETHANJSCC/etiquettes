@@ -48,7 +48,9 @@ export function EditorPage(): JSX.Element {
           contents={labels.contents}
           settings={settings}
           selection={labels.selection}
-          onToggle={labels.toggleLabel}
+          onSelect={(index, additive) =>
+            additive ? labels.toggleLabel(index) : labels.selectSingle(index)
+          }
         />
       </Box>
 

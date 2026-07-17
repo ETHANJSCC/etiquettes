@@ -91,7 +91,7 @@ export function SettingsPage(): JSX.Element {
           contents={labels.contents}
           settings={draft}
           selection={new Set<number>()}
-          onToggle={() => undefined}
+          onSelect={() => undefined}
         />
       </Box>
 

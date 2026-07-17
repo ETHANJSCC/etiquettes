@@ -10,8 +10,12 @@ export interface LabelCardProps {
   content: LabelContent
   /** Etiquette selectionnee ? */
   selected: boolean
-  /** Appele au clic (bascule la selection). */
-  onToggle: (index: number) => void
+  /**
+   * Appele au clic. `additive` vaut `true` si Ctrl/Cmd est enfonce :
+   *  - clic simple  -> selectionne uniquement cette etiquette ;
+   *  - Ctrl+clic    -> ajoute / retire cette etiquette de la selection.
+   */
+  onSelect: (index: number, additive: boolean) => void
 }
 
 /**
@@ -22,7 +26,7 @@ export interface LabelCardProps {
  * cliquable discret. La mise en evidence de la selection est purement visuelle
  * et n'apparait jamais a l'impression.
  */
-function LabelCardComponent({ box, content, selected, onToggle }: LabelCardProps): JSX.Element {
+function LabelCardComponent({ box, content, selected, onSelect }: LabelCardProps): JSX.Element {
   const empty = isEmptyContent(content)
 
   // Le HTML interieur n'est recalcule que si le contenu change (evite de
@@ -41,11 +45,11 @@ function LabelCardComponent({ box, content, selected, onToggle }: LabelCardProps
       aria-pressed={selected}
       aria-label={`Etiquette ${box.index + 1}${empty ? ' (vide)' : ''}`}
       tabIndex={0}
-      onClick={() => onToggle(box.index)}
+      onClick={(e) => onSelect(box.index, e.ctrlKey || e.metaKey)}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault()
-          onToggle(box.index)
+          onSelect(box.index, e.ctrlKey || e.metaKey)
         }
       }}
       style={{

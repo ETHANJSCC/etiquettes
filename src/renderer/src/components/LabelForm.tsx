@@ -35,7 +35,10 @@ export function LabelForm({ labels }: LabelFormProps): JSX.Element {
 
       {disabled ? (
         <Alert severity="info" variant="outlined">
-          Sélectionnez une ou plusieurs étiquettes sur la planche pour saisir leurs informations.
+          Cliquez sur une étiquette de la planche pour saisir ses informations.
+          <br />
+          Astuce : <strong>Ctrl+clic</strong> pour en sélectionner plusieurs et leur appliquer le
+          même contenu.
         </Alert>
       ) : (
         <Stack spacing={2.5}>
