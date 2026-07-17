@@ -213,6 +213,15 @@ npm run build:unpacked   # release/win-unpacked/ (exe + fichiers annexes)
 - **Sécurité** : `contextIsolation` activé, `nodeIntegration` désactivé, aucune
   ressource distante. La seule surface exposée au renderer est l'API typée
   `window.etiquettes` (impression, PDF, Word, paramètres).
+- **Performances** (pour rester léger sur des postes modestes) :
+  - accélération GPU et calcul d'occlusion Windows désactivés (l'interface est
+    statique : le rendu logiciel suffit et évite une surcharge CPU/GPU) ;
+  - la librairie Word (`docx`, volumineuse) est chargée **à la demande** (import
+    dynamique) : le démarrage ne charge que ~950 Ko de JavaScript au lieu de
+    ~1,65 Mo ;
+  - correcteur orthographique désactivé (inutile pour des références
+    d'inventaire) ;
+  - application sans boucle ni minuterie : consommation nulle au repos.
 
 ### Impression au plus juste
 

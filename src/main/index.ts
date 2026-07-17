@@ -11,6 +11,18 @@ import {
 import { readSettings, writeSettings } from './settingsStore'
 import { exportSheetToPdf, exportWordDocument, openInWord, printSheet } from './printing'
 
+/*
+ * Optimisations de performance (a appliquer AVANT que l'application soit prete).
+ *
+ * L'application n'affiche qu'une interface statique 2D : le rendu materiel (GPU)
+ * n'apporte rien et peut au contraire surcharger le processeur / la carte
+ * graphique sur des postes d'entreprise modestes, un GPU integre ou une session
+ * de bureau a distance. On le desactive donc, ainsi que le calcul d'occlusion
+ * des fenetres sous Windows (source connue de consommation CPU au repos).
+ */
+app.disableHardwareAcceleration()
+app.commandLine.appendSwitch('disable-features', 'CalculateNativeWinOcclusion')
+
 /** Reference vers la fenetre principale (utile pour parenter les dialogues). */
 let mainWindow: BrowserWindow | null = null
 
@@ -28,7 +40,10 @@ function createWindow(): void {
       preload: join(__dirname, '../preload/index.js'),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: false
+      sandbox: false,
+      // Inutile pour des references d'inventaire (COFLT012, numeros de serie...) :
+      // evite le chargement d'un dictionnaire et la consommation memoire associee.
+      spellcheck: false
     }
   })
 

@@ -7,7 +7,6 @@ import type {
   PrintResult
 } from '../types'
 import { buildSheetHtml } from '../utils/sheetHtml'
-import { buildWordDocument } from '../utils/wordDocument'
 
 /**
  * Service d'impression et d'export PDF.
@@ -15,7 +14,17 @@ import { buildWordDocument } from '../utils/wordDocument'
  * Construit le HTML de la planche a partir du contenu et des parametres, puis
  * delegue au processus principal (via `window.etiquettes`) la generation
  * effective, seule capable de produire une sortie A4 au millimetre.
+ *
+ * Note de performance : le generateur Word (librairie `docx`, volumineuse)
+ * n'est charge qu'a la demande, via un import dynamique, pour ne pas alourdir
+ * le demarrage ni la memoire tant que l'utilisateur n'exporte pas en Word.
  */
+
+/** Charge a la demande le generateur de document Word (code decoupe en chunk separe). */
+async function loadWordBuilder(): Promise<typeof import('../utils/wordDocument').buildWordDocument> {
+  const module = await import('../utils/wordDocument')
+  return module.buildWordDocument
+}
 
 /** Nom de fichier horodate pour l'export, avec l'extension demandee. */
 function defaultFileName(extension: string): string {
@@ -51,6 +60,7 @@ export async function exportWord(
   contents: LabelContent[],
   settings: LabelSettings
 ): Promise<ExportWordResult> {
+  const buildWordDocument = await loadWordBuilder()
   const data = await buildWordDocument(contents, settings)
   return window.etiquettes.exportWord({ data, defaultFileName: defaultFileName('docx') })
 }
@@ -63,6 +73,7 @@ export async function openInWord(
   contents: LabelContent[],
   settings: LabelSettings
 ): Promise<OpenInWordResult> {
+  const buildWordDocument = await loadWordBuilder()
   const data = await buildWordDocument(contents, settings)
   return window.etiquettes.openInWord({ data })
 }

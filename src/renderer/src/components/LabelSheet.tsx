@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { GlobalStyles } from '@mui/material'
 import type { LabelContent, LabelSettings, Selection } from '../types'
 import { A4_HEIGHT_MM, A4_WIDTH_MM } from '../utils/constants'
@@ -41,6 +42,9 @@ const PREVIEW_CSS = `
 .etq-selected-tint { position: absolute; inset: 0; background: rgba(21,101,192,0.12); pointer-events: none; }
 `
 
+/** Feuille de style combinee, calculee une seule fois (evite un retraitement a chaque rendu). */
+const SHEET_STYLES = LABEL_CSS + PREVIEW_CSS
+
 /**
  * Apercu graphique de la planche A4.
  *
@@ -55,14 +59,16 @@ export function LabelSheet({
   onToggle
 }: LabelSheetProps): JSX.Element {
   const { ref, width } = useElementSize()
-  const boxes = computeLabelBoxes(settings)
+  // Les positions ne dependent que des parametres : on evite de les recalculer
+  // a chaque changement de selection ou de saisie.
+  const boxes = useMemo(() => computeLabelBoxes(settings), [settings])
 
   const rawScale = width > 0 ? width / A4_PX_WIDTH : 1
   const scale = Math.min(1.4, Math.max(0.15, rawScale))
 
   return (
     <>
-      <GlobalStyles styles={LABEL_CSS + PREVIEW_CSS} />
+      <GlobalStyles styles={SHEET_STYLES} />
       <div ref={ref} style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
         {/* Reserve l'espace correspondant a la planche mise a l'echelle. */}
         <div style={{ width: A4_PX_WIDTH * scale, height: A4_PX_HEIGHT * scale }}>
