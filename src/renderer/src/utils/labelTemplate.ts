@@ -49,8 +49,8 @@ export const LABEL_CSS = `
   overflow: hidden;
   background: #ffffff;
   color: #000000;
-  /* Police et tailles identiques au modele Word d'origine (Calibri, 8/9/11 pt). */
-  font-family: Calibri, "Segoe UI", Carlito, Arial, sans-serif;
+  /* Champs Nom / Modele / S/N : Arial (les barres passent en Calibri ci-dessous). */
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 9pt;
   line-height: 1.05;
 }
@@ -63,6 +63,8 @@ export const LABEL_CSS = `
   background: #000000;
   color: #ffffff;
   font-weight: 700;
+  /* Barres « wienerberger France » et « Helpdesk - Scannez moi » : Calibri. */
+  font-family: Calibri, "Segoe UI", Carlito, sans-serif;
   font-size: 11pt;
   text-align: center;
   overflow: hidden;

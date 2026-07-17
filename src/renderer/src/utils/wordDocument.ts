@@ -43,6 +43,15 @@ const NO_BORDERS = {
 }
 const ZERO_MARGINS = { top: 0, bottom: 0, left: 0, right: 0 }
 
+/**
+ * Polices appliquees explicitement a chaque texte (sans cela, Word retombe sur
+ * Times New Roman) :
+ *  - barres noires (haut / bas)      -> Calibri ;
+ *  - champs Nom / Modele / S/N       -> Arial.
+ */
+const BAR_FONT = 'Calibri'
+const FIELD_FONT = 'Arial'
+
 /** Decode l'image QR (data URL base64) en octets bruts pour l'insertion Word. */
 function qrImageBytes(): Uint8Array {
   const base64 = QR_IMAGE_DATA_URL.split(',')[1] ?? ''
@@ -57,7 +66,7 @@ function barParagraph(text: string): Paragraph {
   return new Paragraph({
     alignment: AlignmentType.CENTER,
     spacing: { before: 0, after: 0 },
-    children: [new TextRun({ text, bold: true, color: 'FFFFFF', size: 22 })]
+    children: [new TextRun({ text, bold: true, color: 'FFFFFF', size: 22, font: BAR_FONT })]
   })
 }
 
@@ -78,8 +87,8 @@ function fieldParagraph(key: string, value: string): Paragraph {
   return new Paragraph({
     spacing: { before: 0, after: 0 },
     children: [
-      new TextRun({ text: `${key} `, bold: true, size: 16 }),
-      new TextRun({ text: value, bold: true, size: 18 })
+      new TextRun({ text: `${key} `, bold: true, size: 16, font: FIELD_FONT }),
+      new TextRun({ text: value, bold: true, size: 18, font: FIELD_FONT })
     ]
   })
 }
