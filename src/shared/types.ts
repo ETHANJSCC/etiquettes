@@ -69,7 +69,8 @@ export const IpcChannels = {
   OpenInWord: 'etiquettes:open-in-word',
   PrintSheet: 'etiquettes:print-sheet',
   LoadSettings: 'etiquettes:load-settings',
-  SaveSettings: 'etiquettes:save-settings'
+  SaveSettings: 'etiquettes:save-settings',
+  GetAppVersion: 'etiquettes:get-app-version'
 } as const
 
 /** Requete d'export PDF : le HTML complet de la planche et un nom de fichier propose. */
@@ -148,4 +149,6 @@ export interface EtiquettesApi {
   loadSettings(): Promise<StoredSettings | null>
   /** Enregistre les parametres de facon persistante. */
   saveSettings(settings: StoredSettings): Promise<void>
+  /** Version de l'application (issue de package.json), affichee dans les Parametres. */
+  getAppVersion(): Promise<string>
 }

@@ -36,7 +36,9 @@ const api: EtiquettesApi = {
     ipcRenderer.invoke(IpcChannels.LoadSettings),
 
   saveSettings: (settings: StoredSettings): Promise<void> =>
-    ipcRenderer.invoke(IpcChannels.SaveSettings, settings)
+    ipcRenderer.invoke(IpcChannels.SaveSettings, settings),
+
+  getAppVersion: (): Promise<string> => ipcRenderer.invoke(IpcChannels.GetAppVersion)
 }
 
 // Expose l'API de facon securisee sous `window.etiquettes`.

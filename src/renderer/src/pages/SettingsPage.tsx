@@ -15,6 +15,7 @@ import UndoRoundedIcon from '@mui/icons-material/UndoRounded'
 import type { LabelSettings } from '../types'
 import { DEFAULT_SETTINGS } from '../utils/constants'
 import { useAppContext } from '../hooks/useAppContext'
+import { useAppVersion } from '../hooks/useAppVersion'
 import { NumberField } from '../components/NumberField'
 import { LabelSheet } from '../components/LabelSheet'
 
@@ -63,6 +64,7 @@ function areEqual(a: LabelSettings, b: LabelSettings): boolean {
  */
 export function SettingsPage(): JSX.Element {
   const { settings, saveSettings, resetSettings, labels } = useAppContext()
+  const appVersion = useAppVersion()
   const [draft, setDraft] = useState<LabelSettings>(settings)
   const [saved, setSaved] = useState(false)
 
@@ -172,6 +174,11 @@ export function SettingsPage(): JSX.Element {
               </Button>
             </Stack>
           </Stack>
+
+          <Divider />
+          <Typography variant="caption" color="text.secondary" align="center">
+            Étiquettes Inventaire {appVersion ? `— version ${appVersion}` : ''}
+          </Typography>
         </Stack>
       </Paper>
 

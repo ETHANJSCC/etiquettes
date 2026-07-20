@@ -95,6 +95,10 @@ function registerIpcHandlers(): void {
   ipcMain.handle(IpcChannels.PrintSheet, (_event, request: PrintRequest) =>
     printSheet(request)
   )
+
+  // Lit la version depuis package.json (source unique de verite, deja utilisee
+  // par electron-builder pour nommer les executables generes).
+  ipcMain.handle(IpcChannels.GetAppVersion, () => app.getVersion())
 }
 
 /**
