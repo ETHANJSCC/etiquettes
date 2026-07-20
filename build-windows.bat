@@ -4,12 +4,13 @@ setlocal
 cd /d "%~dp0"
 
 echo ============================================================
-echo   Etiquettes Inventaire - Generation de l'executable
+echo   Etiquettes Inventaire - Generation des executables
 echo ============================================================
 echo.
 echo Cette operation telecharge les composants necessaires puis
-echo cree l'application. La premiere fois peut prendre plusieurs
-echo minutes selon la connexion.
+echo cree l'installeur et la version portable.
+echo Aucun droit administrateur n'est requis.
+echo La premiere fois peut prendre quelques minutes selon la connexion.
 echo.
 
 where npm >nul 2>nul
@@ -26,13 +27,15 @@ call npm install
 if errorlevel 1 goto erreur
 
 echo.
-echo [2/2] Creation de l'executable portable ^(npm run build:win^)...
-call npm run build:win
+echo [2/2] Creation des executables ^(installeur + portable^)...
+call npm run dist
 if errorlevel 1 goto erreur
 
 echo.
 echo ============================================================
-echo   Termine ! L'executable se trouve dans le dossier "release".
+echo   Termine ! Les fichiers sont dans le dossier "release" :
+echo     - ...-Installeur.exe  (installation en un clic)
+echo     - ...-Portable.exe    (a lancer sans installation)
 echo ============================================================
 start "" "%~dp0release"
 echo.

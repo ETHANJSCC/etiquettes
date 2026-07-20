@@ -8,7 +8,6 @@ export type {
   LabelContent,
   LabelSettings,
   StoredSettings,
-  LabelData,
   ExportPdfRequest,
   ExportPdfResult,
   ExportWordRequest,

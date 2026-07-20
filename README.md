@@ -80,11 +80,11 @@ depuis la page **Paramètres**.
 
 ## Pile technique
 
-- [Electron](https://www.electronjs.org/) — application de bureau
-- [React](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/) (mode **strict**)
-- [Vite](https://vitejs.dev/) via [electron-vite](https://electron-vite.org/)
+- [Electron 43](https://www.electronjs.org/) — application de bureau (runtime à jour, sans CVE connue)
+- [React 18](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/) (mode **strict**)
+- [Vite 7](https://vitejs.dev/) via [electron-vite 5](https://electron-vite.org/)
 - [Material UI](https://mui.com/) — interface sobre et professionnelle
-- [electron-builder](https://www.electron.build/) — packaging Windows
+- [electron-builder 26](https://www.electron.build/) — packaging Windows (NSIS + portable)
 - [docx](https://www.npmjs.com/package/docx) — génération des documents Word
 
 Aucun accès réseau n'est requis à l'exécution : tout est embarqué (QR compris).
@@ -122,7 +122,7 @@ src/
         │   ├── useLabels.ts         État des étiquettes + sélection
         │   ├── useSettings.ts       Chargement / persistance des réglages
         │   ├── useElementSize.ts    Mesure d'élément (mise à l'échelle)
-        │   └── useAppContext.ts     Contexte applicatif (routeur)
+        │   └── useAppContext.ts     Contexte applicatif (état partagé)
         ├── services/        Accès aux fonctions du processus principal
         │   ├── printService.ts      Construction HTML/Word + impression / export
         │   └── settingsService.ts   Normalisation, versionnage + persistance
@@ -134,7 +134,7 @@ src/
         │   ├── labelTemplate.ts     Gabarit UNIQUE d'une étiquette (aperçu + impression)
         │   ├── sheetHtml.ts         Construction du HTML A4 imprimable
         │   └── wordDocument.ts      Génération du document Word (.docx)
-        ├── App.tsx          Composant racine (thème, routeur, état global)
+        ├── App.tsx          Composant racine (thème, contexte, état global)
         ├── theme.ts         Thème Material UI
         └── main.tsx         Point d'entrée du renderer
 ```
@@ -168,32 +168,33 @@ npm run build       # typecheck + bundling de production
 
 ## Compilation Windows
 
-Depuis une machine **Windows** :
+Depuis une machine **Windows** (ou en double-cliquant sur `build-windows.bat`) :
 
 ```bash
 npm install
-npm run build:win
+npm run dist        # installeur NSIS + version portable, en une commande
 ```
 
-Le résultat est un **exécutable unique et portable** dans le dossier `release/` :
+Le dossier `release/` contient alors **les deux formats de distribution** :
 
-- `Etiquettes Inventaire-1.0.0.exe` — **aucune installation** : il suffit de
-  double-cliquer pour lancer l'application. Ne nécessite pas de droits
-  administrateur et peut être copié où l'on veut (poste, clé USB, partage
-  réseau).
+- **`Etiquettes Inventaire-1.0.0-Installeur.exe`** — installeur **en un clic**
+  (moins de 30 s), **sans droits administrateur** (installation par
+  utilisateur), avec raccourcis Bureau et menu Démarrer. **Format recommandé.**
+- **`Etiquettes Inventaire-1.0.0-Portable.exe`** — à lancer **sans installation**
+  (clé USB, partage réseau…).
 
-Au premier lancement, l'exécutable s'auto-extrait dans un dossier temporaire.
-Les paramètres de calibrage sont conservés dans
-`%APPDATA%\Etiquettes Inventaire\` d'un lancement à l'autre.
+Une fois généré, chaque `.exe` est **autonome** : l'utilisateur final n'installe
+**rien** (ni Node.js, ni dépendances). Les paramètres de calibrage sont conservés
+dans `%APPDATA%\Etiquettes Inventaire\`.
 
-Pour obtenir à la place un dossier décompressé (utile en développement) :
+> **Build sans administrateur ni erreur.** La signature de code est désactivée
+> (`signExecutable: false`) : electron-builder ne télécharge plus l'outil
+> `winCodeSign`, ce qui supprime l'erreur de liens symboliques qui obligeait
+> auparavant à lancer le build en administrateur. L'icône et les métadonnées de
+> l'exécutable restent appliquées (via `resedit`, en JavaScript pur).
 
-```bash
-npm run build:unpacked   # release/win-unpacked/ (exe + fichiers annexes)
-```
-
-> La première compilation télécharge le binaire Electron et les outils de
-> packaging depuis Internet ; une connexion est donc nécessaire à ce stade.
+> La première compilation télécharge le binaire Electron depuis Internet ; une
+> connexion est donc nécessaire à ce stade uniquement.
 
 ---
 
@@ -210,18 +211,24 @@ npm run build:unpacked   # release/win-unpacked/ (exe + fichiers annexes)
   PDF qu'en Word).
 - **QR fixe** : le QR de l'entreprise est embarqué en image (base64) et réutilisé
   à l'identique sur chaque étiquette — il ne dépend pas du contenu saisi.
-- **Sécurité** : `contextIsolation` activé, `nodeIntegration` désactivé, aucune
-  ressource distante. La seule surface exposée au renderer est l'API typée
-  `window.etiquettes` (impression, PDF, Word, paramètres).
+- **Sécurité** (configuration durcie, distribuable en entreprise) :
+  - `contextIsolation` **activé**, bac à sable (`sandbox`) **activé**,
+    `nodeIntegration` **désactivé** ;
+  - **Content-Security-Policy** stricte en production, aucune ressource distante ;
+  - navigation hors application bloquée, liens externes ouverts dans le navigateur ;
+  - seule surface exposée au renderer : l'API typée `window.etiquettes`
+    (impression, PDF, Word, paramètres) — aucune API Node accessible directement.
 - **Performances** (pour rester léger sur des postes modestes) :
   - accélération GPU et calcul d'occlusion Windows désactivés (l'interface est
     statique : le rendu logiciel suffit et évite une surcharge CPU/GPU) ;
-  - la librairie Word (`docx`, volumineuse) est chargée **à la demande** (import
-    dynamique) : le démarrage ne charge que ~950 Ko de JavaScript au lieu de
-    ~1,65 Mo ;
-  - correcteur orthographique désactivé (inutile pour des références
-    d'inventaire) ;
-  - application sans boucle ni minuterie : consommation nulle au repos.
+  - la librairie Word (`docx`) est chargée **à la demande** (import dynamique) :
+    le démarrage ne charge que ~470 Ko de JavaScript (le reste, ~370 Ko, n'est
+    lu que lors d'un export Word) ;
+  - correcteur orthographique désactivé (inutile pour des références d'inventaire) ;
+  - application sans boucle ni minuterie : consommation nulle au repos ;
+  - build de production optimisé (minification, tree-shaking, code-splitting).
+- **Zéro vulnérabilité** connue (`npm audit`) : dépendances à jour, aucune
+  dépendance inutilisée.
 
 ### Impression au plus juste
 

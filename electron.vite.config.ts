@@ -38,9 +38,20 @@ export default defineConfig({
   renderer: {
     root: resolve(__dirname, 'src/renderer'),
     build: {
+      // Optimisations de production : minification esbuild, pas de sourcemap
+      // embarquee, chunk Word charge a la demande (voir printService).
+      minify: 'esbuild',
+      sourcemap: false,
+      reportCompressedSize: false,
+      chunkSizeWarningLimit: 1500,
       rollupOptions: {
         input: { index: resolve(__dirname, 'src/renderer/index.html') }
       }
+    },
+    // Retire les appels de debogage du bundle de production.
+    esbuild: {
+      drop: ['debugger'],
+      pure: ['console.log', 'console.debug', 'console.info']
     },
     resolve: {
       alias: {

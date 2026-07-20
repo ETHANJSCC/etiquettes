@@ -49,14 +49,6 @@ export interface LabelSettings {
   rows: number
 }
 
-/** Une etiquette telle qu'affichee/imprimee : son index sur la planche et son contenu. */
-export interface LabelData {
-  /** Index de l'etiquette (0 -> columns*rows - 1), en lecture ligne par ligne. */
-  index: number
-  /** Contenu textuel de l'etiquette. */
-  content: LabelContent
-}
-
 /**
  * Parametres tels qu'ecrits sur le disque : les reglages geometriques plus un
  * numero de version de schema permettant d'ignorer une ancienne calibration

@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, session } from 'electron'
 import { join } from 'node:path'
 import {
   IpcChannels,
@@ -38,9 +38,11 @@ function createWindow(): void {
     title: 'Etiquettes Inventaire',
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
+      // Configuration securisee : isolation de contexte, bac a sable actif,
+      // aucune integration Node dans le renderer.
       contextIsolation: true,
+      sandbox: true,
       nodeIntegration: false,
-      sandbox: false,
       // Inutile pour des references d'inventaire (COFLT012, numeros de serie...) :
       // evite le chargement d'un dictionnaire et la consommation memoire associee.
       spellcheck: false
@@ -53,6 +55,11 @@ function createWindow(): void {
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     void shell.openExternal(url)
     return { action: 'deny' }
+  })
+
+  // Empeche toute navigation hors de l'application (defense en profondeur).
+  mainWindow.webContents.on('will-navigate', (event, url) => {
+    if (url !== mainWindow?.webContents.getURL()) event.preventDefault()
   })
 
   // En developpement, electron-vite expose l'URL du serveur Vite ; en
@@ -90,7 +97,31 @@ function registerIpcHandlers(): void {
   )
 }
 
+/**
+ * Applique une Content-Security-Policy stricte en production (defense en
+ * profondeur). En developpement, on s'abstient pour ne pas gener le
+ * rechargement a chaud du serveur Vite.
+ */
+function applyContentSecurityPolicy(): void {
+  const isDev = Boolean(process.env['ELECTRON_RENDERER_URL'])
+  if (isDev) return
+
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': [
+          "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; " +
+            "img-src 'self' data:; font-src 'self' data:; connect-src 'self'; " +
+            "object-src 'none'; base-uri 'self'; form-action 'none'"
+        ]
+      }
+    })
+  })
+}
+
 app.whenReady().then(() => {
+  applyContentSecurityPolicy()
   registerIpcHandlers()
   createWindow()
 

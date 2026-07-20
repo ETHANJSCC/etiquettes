@@ -24,9 +24,6 @@ export const A4_WIDTH_MM = 210
 /** Hauteur d'une feuille A4 en millimetres. */
 export const A4_HEIGHT_MM = 297
 
-/** Facteur de conversion twips -> millimetres (1 twip = 25,4 / 1440 mm). */
-export const TWIP_TO_MM = 25.4 / 1440
-
 /**
  * Version du schema de reglages. Incrementee lorsque les valeurs par defaut
  * changent de facon significative : les reglages persistes d'une version

@@ -1,23 +1,23 @@
+import { useState } from 'react'
 import { AppBar, Box, Tab, Tabs, Toolbar, Typography } from '@mui/material'
 import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded'
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded'
 import LocalOfferRoundedIcon from '@mui/icons-material/LocalOfferRounded'
-import { Outlet, useLocation, useNavigate } from 'react-router-dom'
-import type { AppContext } from '../hooks/useAppContext'
+import { EditorPage } from '../pages/EditorPage'
+import { SettingsPage } from '../pages/SettingsPage'
 
-export interface AppLayoutProps {
-  /** Contexte applicatif transmis aux pages via l'Outlet. */
-  ctx: AppContext
-}
+/** Onglet (page) actuellement affiche. */
+type Page = 'editor' | 'settings'
 
 /**
  * Ossature de l'application : barre de titre, navigation entre l'editeur et la
- * page des parametres, et zone de contenu (Outlet du routeur).
+ * page des parametres, et zone de contenu.
+ *
+ * La navigation est geree par un simple etat local (pas de routeur) : plus
+ * leger et suffisant pour deux pages.
  */
-export function AppLayout({ ctx }: AppLayoutProps): JSX.Element {
-  const location = useLocation()
-  const navigate = useNavigate()
-  const currentTab = location.pathname.startsWith('/parametres') ? '/parametres' : '/'
+export function AppLayout(): JSX.Element {
+  const [page, setPage] = useState<Page>('editor')
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
@@ -29,21 +29,21 @@ export function AppLayout({ ctx }: AppLayoutProps): JSX.Element {
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
           <Tabs
-            value={currentTab}
-            onChange={(_event, value: string) => navigate(value)}
+            value={page}
+            onChange={(_event, value: Page) => setPage(value)}
             textColor="inherit"
             indicatorColor="secondary"
           >
             <Tab
               label="Éditeur"
-              value="/"
+              value="editor"
               icon={<GridViewRoundedIcon />}
               iconPosition="start"
               sx={{ minHeight: 48 }}
             />
             <Tab
               label="Paramètres"
-              value="/parametres"
+              value="settings"
               icon={<SettingsRoundedIcon />}
               iconPosition="start"
               sx={{ minHeight: 48 }}
@@ -53,7 +53,9 @@ export function AppLayout({ ctx }: AppLayoutProps): JSX.Element {
       </AppBar>
 
       <Box component="main" sx={{ flexGrow: 1, minHeight: 0, overflow: 'hidden' }}>
-        <Outlet context={ctx} />
+        {/* L'editeur reste monte en arriere-plan pour preserver l'apercu ;
+            l'etat des etiquettes vit de toute facon dans le contexte applicatif. */}
+        {page === 'editor' ? <EditorPage /> : <SettingsPage />}
       </Box>
     </Box>
   )

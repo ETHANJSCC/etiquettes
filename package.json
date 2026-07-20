@@ -12,28 +12,28 @@
     "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
     "typecheck": "npm run typecheck:node && npm run typecheck:web",
     "build": "npm run typecheck && electron-vite build",
-    "build:win": "npm run build && electron-builder --win --config electron-builder.yml",
-    "build:unpacked": "npm run build && electron-builder --dir --config electron-builder.yml"
+    "dist": "npm run build && electron-builder --win --config electron-builder.yml",
+    "build:win": "npm run dist",
+    "build:dir": "npm run build && electron-builder --dir --config electron-builder.yml"
   },
   "dependencies": {
-    "docx": "^9.1.1"
+    "docx": "^9.5.1"
   },
   "devDependencies": {
-    "@emotion/react": "^11.13.5",
-    "@emotion/styled": "^11.13.5",
-    "@mui/icons-material": "^6.1.9",
-    "@mui/material": "^6.1.9",
-    "@types/node": "^22.10.1",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
-    "@vitejs/plugin-react": "^4.3.4",
-    "electron": "^33.2.1",
-    "electron-builder": "^25.1.8",
-    "electron-vite": "^2.3.0",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^6.5.0",
+    "@mui/material": "^6.5.0",
+    "@types/node": "^22.18.0",
+    "@types/react": "^18.3.24",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^5.0.4",
+    "electron": "^43.1.1",
+    "electron-builder": "^26.0.12",
+    "electron-vite": "^5.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.28.0",
-    "typescript": "^5.6.3",
-    "vite": "^5.4.11"
+    "typescript": "^5.9.3",
+    "vite": "^7.1.5"
   }
 }

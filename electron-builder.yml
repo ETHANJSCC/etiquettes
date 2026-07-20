@@ -6,33 +6,40 @@ directories:
   buildResources: build
   output: release
 
-# Fichiers embarques dans l'application packagee.
+# Fichiers embarques dans l'application packagee (uniquement le build de prod).
 files:
   - out/**/*
   - package.json
 
-# Cible Windows : un unique .exe portable, sans installation.
+# --- Cible Windows : installeur NSIS + version portable, en une seule commande ---
 win:
+  icon: build/icon.ico
+  # Ne PAS signer l'executable : evite le telechargement de winCodeSign
+  # (et donc l'erreur de liens symboliques qui exigeait des droits admin).
+  # L'icone et les metadonnees restent appliquees via resedit (JavaScript pur).
+  signExecutable: false
   target:
+    - target: nsis
+      arch:
+        - x64
     - target: portable
       arch:
         - x64
-  artifactName: ${productName}-${version}.${ext}
 
-# Options de la version portable (un seul executable auto-extractible).
-#
-# IMPORTANT : ne PAS fixer `unpackDirName` a un nom constant. Un dossier
-# d'extraction fixe et reutilise entre lancements peut rester a moitie
-# extrait si l'utilisateur double-clique une seconde fois pendant que
-# l'extraction est en cours (ou si un antivirus interfere) : tous les
-# lancements suivants reutilisent alors ce dossier corrompu et echouent
-# avec des erreurs du type "ffmpeg.dll introuvable". En laissant
-# electron-builder generer un nom de dossier base sur le contenu/version,
-# chaque nouvelle build repart d'une extraction saine.
+# Installeur NSIS « ultra simple » : un clic, sans droits administrateur.
+nsis:
+  oneClick: true # installation immediate, sans assistant
+  perMachine: false # installation par utilisateur -> aucun droit admin requis
+  allowElevation: false # ne jamais demander d'elevation
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  runAfterFinish: true # lance l'application a la fin de l'installation
+  shortcutName: Etiquettes Inventaire
+  artifactName: ${productName}-${version}-Installeur.${ext}
+
+# Version portable (un seul .exe, sans installation).
 portable:
-  artifactName: ${productName}-${version}.${ext}
-  requestExecutionLevel: user
+  artifactName: ${productName}-${version}-Portable.${ext}
 
-# Empeche electron-builder d'essayer de reconstruire des modules natifs
-# (le projet n'en utilise aucun).
+# Le projet n'utilise aucun module natif : pas de recompilation.
 npmRebuild: false
