@@ -1,6 +1,6 @@
 {
   "name": "etiqtool",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Impression d'etiquettes d'inventaire sur planches A4 autocollantes (Avery L6011).",
   "author": "Support Informatique Wienerberger France",
   "license": "MIT",

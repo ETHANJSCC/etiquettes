@@ -14,7 +14,7 @@ export function getLabelCount(settings: LabelSettings): number {
  * Calcule la position (en mm) de chaque etiquette sur la feuille.
  *
  * Les etiquettes sont numerotees ligne par ligne, de gauche a droite puis de
- * haut en bas — exactement comme sur la planche physique.
+ * haut en bas - exactement comme sur la planche physique.
  */
 export function computeLabelBoxes(settings: LabelSettings): LabelBox[] {
   const { columns, rows, marginLeft, marginTop, labelWidth, labelHeight, gapX, gapY } = settings

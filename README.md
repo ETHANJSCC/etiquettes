@@ -1,4 +1,4 @@
-# EtiqTool — Wienerberger France
+# EtiqTool - Wienerberger France
 
 Application de bureau (Windows) destinée au support informatique pour imprimer
 des **étiquettes d'inventaire** sur des planches A4 autocollantes, sans plus
@@ -31,7 +31,7 @@ officielle des feuilles utilisées), pour un alignement au plus juste.
 | Élément                     | Valeur exacte (Avery L6011) |
 | --------------------------- | --------------------------- |
 | Format de page              | 210 × 297 mm (A4)           |
-| Grille                      | 3 colonnes × 9 rangées — **27 étiquettes / feuille** |
+| Grille                      | 3 colonnes × 9 rangées - **27 étiquettes / feuille** |
 | Étiquette                   | 63,5 × 29,6 mm              |
 | Espacement horizontal       | 2,5 mm (pas de 66,0 mm)     |
 | Espacement vertical         | 0 mm (rangées jointives, pas de 29,6 mm) |
@@ -80,12 +80,12 @@ depuis la page **Paramètres**.
 
 ## Pile technique
 
-- [Electron 43](https://www.electronjs.org/) — application de bureau (runtime à jour, sans CVE connue)
+- [Electron 43](https://www.electronjs.org/) - application de bureau (runtime à jour, sans CVE connue)
 - [React 18](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/) (mode **strict**)
 - [Vite 7](https://vitejs.dev/) via [electron-vite 5](https://electron-vite.org/)
-- [Material UI](https://mui.com/) — interface sobre et professionnelle
-- [electron-builder 26](https://www.electron.build/) — packaging Windows (NSIS + portable)
-- [docx](https://www.npmjs.com/package/docx) — génération des documents Word
+- [Material UI](https://mui.com/) - interface sobre et professionnelle
+- [electron-builder 26](https://www.electron.build/) - packaging Windows (NSIS + portable)
+- [docx](https://www.npmjs.com/package/docx) - génération des documents Word
 
 Aucun accès réseau n'est requis à l'exécution : tout est embarqué (QR compris).
 
@@ -177,10 +177,10 @@ npm run dist        # installeur NSIS + version portable, en une commande
 
 Le dossier `release/` contient alors **les deux formats de distribution** :
 
-- **`EtiqTool-1.0.0-Installeur.exe`** — installeur **en un clic**
+- **`EtiqTool-1.1.0-Installeur.exe`** - installeur **en un clic**
   (moins de 30 s), **sans droits administrateur** (installation par
   utilisateur), avec raccourcis Bureau et menu Démarrer. **Format recommandé.**
-- **`EtiqTool-1.0.0-Portable.exe`** — à lancer **sans installation**
+- **`EtiqTool-1.1.0-Portable.exe`** - à lancer **sans installation**
   (clé USB, partage réseau…).
 
 Une fois généré, chaque `.exe` est **autonome** : l'utilisateur final n'installe
@@ -210,14 +210,14 @@ dans `%APPDATA%\EtiqTool\`.
   générées ; les autres positions restent parfaitement blanches (aussi bien en
   PDF qu'en Word).
 - **QR fixe** : le QR de l'entreprise est embarqué en image (base64) et réutilisé
-  à l'identique sur chaque étiquette — il ne dépend pas du contenu saisi.
+  à l'identique sur chaque étiquette - il ne dépend pas du contenu saisi.
 - **Sécurité** (configuration durcie, distribuable en entreprise) :
   - `contextIsolation` **activé**, bac à sable (`sandbox`) **activé**,
     `nodeIntegration` **désactivé** ;
   - **Content-Security-Policy** stricte en production, aucune ressource distante ;
   - navigation hors application bloquée, liens externes ouverts dans le navigateur ;
   - seule surface exposée au renderer : l'API typée `window.etiquettes`
-    (impression, PDF, Word, paramètres) — aucune API Node accessible directement.
+    (impression, PDF, Word, paramètres) - aucune API Node accessible directement.
 - **Performances** (pour rester léger sur des postes modestes) :
   - accélération GPU et calcul d'occlusion Windows désactivés (l'interface est
     statique : le rendu logiciel suffit et évite une surcharge CPU/GPU) ;

@@ -206,7 +206,7 @@ export function SettingsPage(): JSX.Element {
 
           <Divider />
           <Typography variant="caption" color="text.secondary" align="center">
-            EtiqTool {appVersion ? `— version ${appVersion}` : ''}
+            EtiqTool {appVersion ? `v${appVersion}` : ''}
           </Typography>
         </Stack>
       </Paper>
