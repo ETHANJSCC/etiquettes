@@ -1,22 +1,17 @@
 import { createContext, useContext } from 'react'
 import type { LabelSettings } from '../types'
+import type { ThemeMode } from '../theme'
 import type { UseLabelsResult } from './useLabels'
 
-/**
- * Contexte applicatif partage entre les pages.
- *
- * L'etat des etiquettes et les parametres sont maintenus au niveau racine
- * (App) afin de survivre a la navigation entre l'editeur et les parametres.
- */
+/** État global partagé entre les pages (survit à la navigation). */
 export interface AppContextValue {
-  /** Parametres geometriques actifs. */
   settings: LabelSettings
-  /** Persiste un nouveau jeu de parametres. */
   saveSettings: (settings: LabelSettings) => Promise<void>
-  /** Restaure les parametres par defaut. */
   resetSettings: () => Promise<void>
-  /** Etat et actions des etiquettes. */
   labels: UseLabelsResult
+  /** Thème clair / sombre. */
+  themeMode: ThemeMode
+  setThemeMode: (mode: ThemeMode) => void
 }
 
 const AppContext = createContext<AppContextValue | null>(null)

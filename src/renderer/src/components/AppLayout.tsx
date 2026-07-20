@@ -25,7 +25,7 @@ export function AppLayout(): JSX.Element {
         <Toolbar variant="dense" sx={{ gap: 1.5 }}>
           <LocalOfferRoundedIcon />
           <Typography variant="h6" sx={{ flexShrink: 0 }}>
-            Étiquettes Inventaire
+            EtiqTool
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
           <Tabs

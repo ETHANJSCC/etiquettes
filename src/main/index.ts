@@ -11,19 +11,10 @@ import {
 import { readSettings, writeSettings } from './settingsStore'
 import { exportSheetToPdf, exportWordDocument, openInWord, printSheet } from './printing'
 
-/*
- * Optimisations de performance (a appliquer AVANT que l'application soit prete).
- *
- * L'application n'affiche qu'une interface statique 2D : le rendu materiel (GPU)
- * n'apporte rien et peut au contraire surcharger le processeur / la carte
- * graphique sur des postes d'entreprise modestes, un GPU integre ou une session
- * de bureau a distance. On le desactive donc, ainsi que le calcul d'occlusion
- * des fenetres sous Windows (source connue de consommation CPU au repos).
- */
+// Interface statique : le rendu logiciel suffit et allège le CPU/GPU.
 app.disableHardwareAcceleration()
 app.commandLine.appendSwitch('disable-features', 'CalculateNativeWinOcclusion')
 
-/** Reference vers la fenetre principale (utile pour parenter les dialogues). */
 let mainWindow: BrowserWindow | null = null
 
 /** Cree et affiche la fenetre principale de l'application. */
@@ -35,35 +26,29 @@ function createWindow(): void {
     minHeight: 700,
     show: false,
     autoHideMenuBar: true,
-    title: 'Etiquettes Inventaire',
+    title: 'EtiqTool',
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      // Configuration securisee : isolation de contexte, bac a sable actif,
-      // aucune integration Node dans le renderer.
       contextIsolation: true,
       sandbox: true,
       nodeIntegration: false,
-      // Inutile pour des references d'inventaire (COFLT012, numeros de serie...) :
-      // evite le chargement d'un dictionnaire et la consommation memoire associee.
       spellcheck: false
     }
   })
 
   mainWindow.on('ready-to-show', () => mainWindow?.show())
 
-  // Ouvre les liens externes dans le navigateur par defaut, jamais dans l'app.
+  // Liens externes dans le navigateur, jamais dans l'app.
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     void shell.openExternal(url)
     return { action: 'deny' }
   })
 
-  // Empeche toute navigation hors de l'application (defense en profondeur).
+  // Bloque toute navigation hors de l'application.
   mainWindow.webContents.on('will-navigate', (event, url) => {
     if (url !== mainWindow?.webContents.getURL()) event.preventDefault()
   })
 
-  // En developpement, electron-vite expose l'URL du serveur Vite ; en
-  // production, on charge le fichier HTML compile.
   const rendererUrl = process.env['ELECTRON_RENDERER_URL']
   if (rendererUrl) {
     void mainWindow.loadURL(rendererUrl)
@@ -96,19 +81,12 @@ function registerIpcHandlers(): void {
     printSheet(request)
   )
 
-  // Lit la version depuis package.json (source unique de verite, deja utilisee
-  // par electron-builder pour nommer les executables generes).
   ipcMain.handle(IpcChannels.GetAppVersion, () => app.getVersion())
 }
 
-/**
- * Applique une Content-Security-Policy stricte en production (defense en
- * profondeur). En developpement, on s'abstient pour ne pas gener le
- * rechargement a chaud du serveur Vite.
- */
+/** CSP stricte en production (désactivée en dev pour ne pas gêner le HMR Vite). */
 function applyContentSecurityPolicy(): void {
-  const isDev = Boolean(process.env['ELECTRON_RENDERER_URL'])
-  if (isDev) return
+  if (process.env['ELECTRON_RENDERER_URL']) return
 
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     callback({

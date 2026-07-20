@@ -24,18 +24,11 @@ export const A4_WIDTH_MM = 210
 /** Hauteur d'une feuille A4 en millimetres. */
 export const A4_HEIGHT_MM = 297
 
-/**
- * Version du schema de reglages. Incrementee lorsque les valeurs par defaut
- * changent de facon significative : les reglages persistes d'une version
- * anterieure sont alors ignores au profit des nouveaux defauts (evite de
- * conserver une ancienne calibration devenue incorrecte).
- */
+// Incrémentée quand les défauts changent : les réglages d'une version
+// antérieure sont alors ignorés au profit des nouveaux.
 export const SETTINGS_VERSION = 2
 
-/**
- * Parametres par defaut de la planche, conformes a la planche Avery L6011.
- * Utilises tant qu'aucun reglage personnalise (meme version) n'est enregistre.
- */
+/** Réglages par défaut (planche Avery L6011). */
 export const DEFAULT_SETTINGS: LabelSettings = {
   marginTop: 15.3,
   marginBottom: 15.3,

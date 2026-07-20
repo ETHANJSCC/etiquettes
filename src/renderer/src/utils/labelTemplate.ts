@@ -2,21 +2,10 @@ import type { LabelContent } from '../types'
 import { LABEL_TEXTS } from './constants'
 import { QR_IMAGE_DATA_URL } from './qrImage'
 
-/**
- * Gabarit unique d'une etiquette.
- *
- * Ce module est la SOURCE UNIQUE du rendu d'une etiquette : il est utilise
- * a la fois par l'apercu interactif (composant React) et par le HTML genere
- * pour l'impression / l'export PDF. Ainsi l'ecran et l'impression sont
- * strictement identiques, sans aucune duplication de balisage ou de style.
- *
- * Reproduction fidele du modele Word :
- *  - barre noire superieure : « wienerberger France » (blanc, gras, centre) ;
- *  - corps : QR code a gauche, trois lignes Nom / Modele / S/N a droite ;
- *  - barre noire inferieure : « Helpdesk - Scannez moi ».
- */
+// Rendu d'une étiquette, partagé entre l'aperçu React et le HTML d'impression
+// (une seule définition, donc écran et impression identiques).
 
-/** Echappe les caracteres speciaux HTML pour une insertion sure dans le balisage. */
+/** Échappe les caractères spéciaux HTML. */
 export function escapeHtml(value: string): string {
   return value
     .replace(/&/g, '&amp;')
@@ -26,14 +15,7 @@ export function escapeHtml(value: string): string {
     .replace(/'/g, '&#39;')
 }
 
-/**
- * Feuille de style de l'interieur d'une etiquette.
- *
- * Les tailles sont exprimees en `em`, relatives a la `font-size` de base posee
- * sur le conteneur `.etq-label` (proportionnelle a la hauteur de l'etiquette).
- * La mise en page reste donc fidele meme si l'utilisateur recalibre les
- * dimensions dans les Parametres.
- */
+/** Styles de l'intérieur d'une étiquette (barres, corps, QR, champs). */
 export const LABEL_CSS = `
 .etq-label {
   position: absolute;
@@ -122,12 +104,7 @@ export const LABEL_CSS = `
 }
 `
 
-/**
- * Genere le HTML interieur d'une etiquette renseignee (barres, QR et champs).
- *
- * @param content Contenu textuel de l'etiquette (nom, modele, numero de serie).
- * @returns Fragment HTML a inserer dans un conteneur `.etq-label`.
- */
+/** HTML intérieur d'une étiquette renseignée, à insérer dans un `.etq-label`. */
 export function renderLabelInner(content: LabelContent): string {
   return (
     `<div class="etq-inner">` +

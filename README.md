@@ -1,4 +1,4 @@
-# Étiquettes Inventaire — Wienerberger France
+# EtiqTool — Wienerberger France
 
 Application de bureau (Windows) destinée au support informatique pour imprimer
 des **étiquettes d'inventaire** sur des planches A4 autocollantes, sans plus
@@ -177,15 +177,15 @@ npm run dist        # installeur NSIS + version portable, en une commande
 
 Le dossier `release/` contient alors **les deux formats de distribution** :
 
-- **`Etiquettes Inventaire-1.0.0-Installeur.exe`** — installeur **en un clic**
+- **`EtiqTool-1.0.0-Installeur.exe`** — installeur **en un clic**
   (moins de 30 s), **sans droits administrateur** (installation par
   utilisateur), avec raccourcis Bureau et menu Démarrer. **Format recommandé.**
-- **`Etiquettes Inventaire-1.0.0-Portable.exe`** — à lancer **sans installation**
+- **`EtiqTool-1.0.0-Portable.exe`** — à lancer **sans installation**
   (clé USB, partage réseau…).
 
 Une fois généré, chaque `.exe` est **autonome** : l'utilisateur final n'installe
 **rien** (ni Node.js, ni dépendances). Les paramètres de calibrage sont conservés
-dans `%APPDATA%\Etiquettes Inventaire\`.
+dans `%APPDATA%\EtiqTool\`.
 
 > **Build sans administrateur ni erreur.** La signature de code est désactivée
 > (`signExecutable: false`) : electron-builder ne télécharge plus l'outil

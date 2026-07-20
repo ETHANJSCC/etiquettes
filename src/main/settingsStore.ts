@@ -13,7 +13,7 @@ import type { StoredSettings } from '@shared/types'
 
 /** Chemin absolu du fichier de configuration. */
 function settingsFilePath(): string {
-  return join(app.getPath('userData'), 'etiquettes-settings.json')
+  return join(app.getPath('userData'), 'etiqtool-settings.json')
 }
 
 /** Lit les parametres persistes, ou `null` si le fichier n'existe pas / est illisible. */

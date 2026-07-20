@@ -23,14 +23,11 @@ const PX_PER_MM = 96 / 25.4
 const A4_PX_WIDTH = A4_WIDTH_MM * PX_PER_MM
 const A4_PX_HEIGHT = A4_HEIGHT_MM * PX_PER_MM
 
-/**
- * Styles reserves a l'apercu (jamais imprimes) : emplacement vide, survol,
- * mise en evidence de la selection.
- */
+/** Styles de l'aperçu uniquement (jamais imprimés) : emplacement vide, survol, sélection. */
 const PREVIEW_CSS = `
 .etq-preview .etq-label { cursor: pointer; transition: filter .12s ease; outline: none; }
 .etq-preview .etq-label:hover { filter: brightness(0.96); }
-.etq-preview .etq-label:focus-visible { box-shadow: 0 0 0 2px #1565c0; }
+.etq-preview .etq-label:focus-visible { box-shadow: 0 0 0 2px #1976d2; }
 .etq-empty {
   width: 100%; height: 100%; box-sizing: border-box;
   display: flex; align-items: center; justify-content: center;
@@ -38,8 +35,8 @@ const PREVIEW_CSS = `
   background: #fafbfc;
 }
 .etq-preview .etq-label:hover .etq-empty { border-color: #90a4ae; color: #607d8b; }
-.etq-selected { box-shadow: inset 0 0 0 0.55mm #1565c0; }
-.etq-selected-tint { position: absolute; inset: 0; background: rgba(21,101,192,0.12); pointer-events: none; }
+.etq-selected { box-shadow: inset 0 0 0 0.8mm #1565c0; }
+.etq-selected-tint { position: absolute; inset: 0; background: rgba(21,101,192,0.20); pointer-events: none; }
 `
 
 /** Feuille de style combinee, calculee une seule fois (evite un retraitement a chaque rendu). */

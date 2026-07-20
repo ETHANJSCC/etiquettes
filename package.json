@@ -1,7 +1,7 @@
 {
-  "name": "etiquettes-inventaire",
+  "name": "etiqtool",
   "version": "1.0.0",
-  "description": "Application de bureau pour imprimer des etiquettes d'inventaire sur planches A4 autocollantes (support informatique Wienerberger France).",
+  "description": "Impression d'etiquettes d'inventaire sur planches A4 autocollantes (Avery L6011).",
   "author": "Support Informatique Wienerberger France",
   "license": "MIT",
   "main": "./out/main/index.js",

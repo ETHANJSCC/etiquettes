@@ -1,5 +1,5 @@
-appId: fr.wienerberger.etiquettes
-productName: Etiquettes Inventaire
+appId: fr.wienerberger.etiqtool
+productName: EtiqTool
 copyright: Copyright © 2026 Wienerberger France
 
 directories:
@@ -34,7 +34,7 @@ nsis:
   createDesktopShortcut: true
   createStartMenuShortcut: true
   runAfterFinish: true # lance l'application a la fin de l'installation
-  shortcutName: Etiquettes Inventaire
+  shortcutName: EtiqTool
   artifactName: ${productName}-${version}-Installeur.${ext}
 
 # Version portable (un seul .exe, sans installation).

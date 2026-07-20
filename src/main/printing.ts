@@ -12,21 +12,14 @@ import type {
   PrintResult
 } from '@shared/types'
 
-/**
- * Fonctions d'impression et d'export PDF.
- *
- * Le principe : le renderer construit le HTML complet de la planche A4
- * (positionnement au millimetre, QR codes inlines). Ce HTML est charge dans
- * une fenetre masquee dediee, ce qui garantit une sortie parfaitement fidele
- * et independante de l'interface de l'application.
- */
+// Impression et export : le renderer fournit le HTML A4, chargé ici dans une
+// fenêtre masquée pour une sortie fidèle et indépendante de l'interface.
 
-/** Cree une fenetre masquee, y charge le HTML fourni, puis attend le rendu complet. */
+/** Fenêtre masquée chargée avec le HTML fourni. */
 async function createHiddenSheetWindow(html: string): Promise<BrowserWindow> {
   const win = new BrowserWindow({
     show: false,
     webPreferences: {
-      // Aucune interaction utilisateur : contexte isole, pas d'integration Node.
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true

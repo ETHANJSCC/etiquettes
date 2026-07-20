@@ -4,7 +4,7 @@ setlocal
 cd /d "%~dp0"
 
 echo ============================================================
-echo   Etiquettes Inventaire - Generation des executables
+echo   EtiqTool - Generation des executables
 echo ============================================================
 echo.
 echo Cette operation telecharge les composants necessaires puis

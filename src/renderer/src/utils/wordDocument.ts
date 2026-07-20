@@ -257,7 +257,7 @@ export async function buildWordDocument(
   })
 
   const doc = new Document({
-    creator: 'Etiquettes Inventaire',
+    creator: 'EtiqTool',
     title: "Planche d'etiquettes",
     sections: [
       {

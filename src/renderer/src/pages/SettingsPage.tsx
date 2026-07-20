@@ -7,11 +7,16 @@ import {
   Paper,
   Snackbar,
   Stack,
+  ToggleButton,
+  ToggleButtonGroup,
   Typography
 } from '@mui/material'
 import SaveRoundedIcon from '@mui/icons-material/SaveRounded'
 import RestartAltRoundedIcon from '@mui/icons-material/RestartAltRounded'
 import UndoRoundedIcon from '@mui/icons-material/UndoRounded'
+import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded'
+import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded'
+import type { ThemeMode } from '../theme'
 import type { LabelSettings } from '../types'
 import { DEFAULT_SETTINGS } from '../utils/constants'
 import { useAppContext } from '../hooks/useAppContext'
@@ -63,7 +68,7 @@ function areEqual(a: LabelSettings, b: LabelSettings): boolean {
  * Un apercu en direct reflete immediatement les valeurs saisies.
  */
 export function SettingsPage(): JSX.Element {
-  const { settings, saveSettings, resetSettings, labels } = useAppContext()
+  const { settings, saveSettings, resetSettings, labels, themeMode, setThemeMode } = useAppContext()
   const appVersion = useAppVersion()
   const [draft, setDraft] = useState<LabelSettings>(settings)
   const [saved, setSaved] = useState(false)
@@ -111,6 +116,30 @@ export function SettingsPage(): JSX.Element {
         }}
       >
         <Stack spacing={3}>
+          <Box>
+            <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+              Apparence
+            </Typography>
+            <ToggleButtonGroup
+              value={themeMode}
+              exclusive
+              fullWidth
+              size="small"
+              onChange={(_event, value: ThemeMode | null) => value && setThemeMode(value)}
+            >
+              <ToggleButton value="light">
+                <LightModeRoundedIcon fontSize="small" sx={{ mr: 1 }} />
+                Clair
+              </ToggleButton>
+              <ToggleButton value="dark">
+                <DarkModeRoundedIcon fontSize="small" sx={{ mr: 1 }} />
+                Sombre
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
+
+          <Divider />
+
           <Box>
             <Typography variant="h6" gutterBottom>
               Paramètres d’impression
@@ -177,7 +206,7 @@ export function SettingsPage(): JSX.Element {
 
           <Divider />
           <Typography variant="caption" color="text.secondary" align="center">
-            Étiquettes Inventaire {appVersion ? `— version ${appVersion}` : ''}
+            EtiqTool {appVersion ? `— version ${appVersion}` : ''}
           </Typography>
         </Stack>
       </Paper>
