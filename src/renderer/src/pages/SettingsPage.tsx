@@ -23,6 +23,7 @@ import { useAppContext } from '../hooks/useAppContext'
 import { useAppVersion } from '../hooks/useAppVersion'
 import { NumberField } from '../components/NumberField'
 import { LabelSheet } from '../components/LabelSheet'
+import { SitesManager } from '../components/SitesManager'
 
 /** Champ editable de la page (une cle numerique des parametres + son libelle). */
 interface FieldDef {
@@ -68,7 +69,8 @@ function areEqual(a: LabelSettings, b: LabelSettings): boolean {
  * Un apercu en direct reflete immediatement les valeurs saisies.
  */
 export function SettingsPage(): JSX.Element {
-  const { settings, saveSettings, resetSettings, labels, themeMode, setThemeMode } = useAppContext()
+  const { settings, saveSettings, resetSettings, labels, themeMode, setThemeMode, sites } =
+    useAppContext()
   const appVersion = useAppVersion()
   const [draft, setDraft] = useState<LabelSettings>(settings)
   const [saved, setSaved] = useState(false)
@@ -136,6 +138,15 @@ export function SettingsPage(): JSX.Element {
                 Sombre
               </ToggleButton>
             </ToggleButtonGroup>
+          </Box>
+
+          <Divider />
+
+          <Box>
+            <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+              Sites
+            </Typography>
+            <SitesManager sites={sites} />
           </Box>
 
           <Divider />

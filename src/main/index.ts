@@ -6,9 +6,13 @@ import {
   type ExportWordRequest,
   type OpenInWordRequest,
   type PrintRequest,
-  type StoredSettings
+  type Site,
+  type StoredSettings,
+  type SuggestComputerNameRequest
 } from '@shared/types'
+import { suggestComputerName } from './ad'
 import { readSettings, writeSettings } from './settingsStore'
+import { readSites, writeSites } from './sitesStore'
 import { exportSheetToPdf, exportWordDocument, openInWord, printSheet } from './printing'
 
 // Interface statique : le rendu logiciel suffit et allège le CPU/GPU.
@@ -82,6 +86,14 @@ function registerIpcHandlers(): void {
   )
 
   ipcMain.handle(IpcChannels.GetAppVersion, () => app.getVersion())
+
+  ipcMain.handle(IpcChannels.LoadSites, () => readSites())
+
+  ipcMain.handle(IpcChannels.SaveSites, (_event, sites: Site[]) => writeSites(sites))
+
+  ipcMain.handle(IpcChannels.SuggestComputerName, (_event, request: SuggestComputerNameRequest) =>
+    suggestComputerName(request.prefix)
+  )
 }
 
 /** CSP stricte en production (désactivée en dev pour ne pas gêner le HMR Vite). */

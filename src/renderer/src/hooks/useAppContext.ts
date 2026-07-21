@@ -2,6 +2,7 @@ import { createContext, useContext } from 'react'
 import type { LabelSettings } from '../types'
 import type { ThemeMode } from '../theme'
 import type { UseLabelsResult } from './useLabels'
+import type { UseSitesResult } from './useSites'
 
 /** État global partagé entre les pages (survit à la navigation). */
 export interface AppContextValue {
@@ -12,6 +13,8 @@ export interface AppContextValue {
   /** Thème clair / sombre. */
   themeMode: ThemeMode
   setThemeMode: (mode: ThemeMode) => void
+  /** Sites configurés (nom + préfixe de nommage). */
+  sites: UseSitesResult
 }
 
 const AppContext = createContext<AppContextValue | null>(null)

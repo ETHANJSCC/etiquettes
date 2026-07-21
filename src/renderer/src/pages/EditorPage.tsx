@@ -34,7 +34,7 @@ interface Notice {
  * renseignees seront imprimees.
  */
 export function EditorPage(): JSX.Element {
-  const { settings, labels } = useAppContext()
+  const { settings, labels, sites } = useAppContext()
   const [notice, setNotice] = useState<Notice>({ open: false, message: '', severity: 'success' })
 
   const notify = (message: string, severity: AlertColor): void =>
@@ -88,7 +88,7 @@ export function EditorPage(): JSX.Element {
             </Stack>
           </Box>
 
-          <LabelForm labels={labels} />
+          <LabelForm labels={labels} sites={sites} />
 
           <Divider flexItem>Sélection</Divider>
           <SelectionToolbar labels={labels} />

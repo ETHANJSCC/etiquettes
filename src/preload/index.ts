@@ -10,7 +10,10 @@ import {
   type OpenInWordResult,
   type PrintRequest,
   type PrintResult,
-  type StoredSettings
+  type Site,
+  type StoredSettings,
+  type SuggestComputerNameRequest,
+  type SuggestComputerNameResult
 } from '@shared/types'
 
 /**
@@ -38,7 +41,14 @@ const api: EtiquettesApi = {
   saveSettings: (settings: StoredSettings): Promise<void> =>
     ipcRenderer.invoke(IpcChannels.SaveSettings, settings),
 
-  getAppVersion: (): Promise<string> => ipcRenderer.invoke(IpcChannels.GetAppVersion)
+  getAppVersion: (): Promise<string> => ipcRenderer.invoke(IpcChannels.GetAppVersion),
+
+  loadSites: (): Promise<Site[]> => ipcRenderer.invoke(IpcChannels.LoadSites),
+
+  saveSites: (sites: Site[]): Promise<void> => ipcRenderer.invoke(IpcChannels.SaveSites, sites),
+
+  suggestComputerName: (request: SuggestComputerNameRequest): Promise<SuggestComputerNameResult> =>
+    ipcRenderer.invoke(IpcChannels.SuggestComputerName, request)
 }
 
 // Expose l'API de facon securisee sous `window.etiquettes`.

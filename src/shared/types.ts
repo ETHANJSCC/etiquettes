@@ -58,6 +58,19 @@ export interface StoredSettings extends LabelSettings {
   version: number
 }
 
+/**
+ * Site (agence) pour lequel des postes sont nommes et etiquetes.
+ * Le prefixe est la partie fixe du nom de machine propre au site
+ * (ex : « COH » pour Colomiers -> COHLT101, COHPC045...).
+ */
+export interface Site {
+  id: string
+  /** Nom lisible du site (ex : Colomiers). */
+  name: string
+  /** Prefixe de nommage du site, lettres/chiffres uniquement (ex : COH). */
+  prefix: string
+}
+
 /* --------------------------------------------------------------------------
  * Contrat IPC (renderer <-> main)
  * ------------------------------------------------------------------------ */
@@ -70,7 +83,10 @@ export const IpcChannels = {
   PrintSheet: 'etiquettes:print-sheet',
   LoadSettings: 'etiquettes:load-settings',
   SaveSettings: 'etiquettes:save-settings',
-  GetAppVersion: 'etiquettes:get-app-version'
+  GetAppVersion: 'etiquettes:get-app-version',
+  LoadSites: 'etiquettes:load-sites',
+  SaveSites: 'etiquettes:save-sites',
+  SuggestComputerName: 'etiquettes:suggest-computer-name'
 } as const
 
 /** Requete d'export PDF : le HTML complet de la planche et un nom de fichier propose. */
@@ -133,6 +149,25 @@ export interface PrintResult {
 }
 
 /**
+ * Requete de suggestion du prochain nom de machine libre.
+ * `prefix` est deja la concatenation site + type (ex : « COHLT »),
+ * validee cote main (lettres/chiffres uniquement) avant toute requete AD.
+ */
+export interface SuggestComputerNameRequest {
+  prefix: string
+}
+
+/** Resultat d'une suggestion de nom de machine. */
+export interface SuggestComputerNameResult {
+  ok: boolean
+  /** Nom de machine propose (ex : COHLT101), absent si `ok` est faux. */
+  suggestion?: string
+  /** Nombre de machines existantes trouvees avec ce prefixe. */
+  existingCount?: number
+  error?: string
+}
+
+/**
  * Interface exposee au renderer via contextBridge (`window.etiquettes`).
  * Elle constitue l'unique surface de contact securisee avec le processus principal.
  */
@@ -151,4 +186,10 @@ export interface EtiquettesApi {
   saveSettings(settings: StoredSettings): Promise<void>
   /** Version de l'application (issue de package.json), affichee dans les Parametres. */
   getAppVersion(): Promise<string>
+  /** Charge la liste des sites persistee (tableau vide si aucune). */
+  loadSites(): Promise<Site[]>
+  /** Enregistre la liste des sites de facon persistante. */
+  saveSites(sites: Site[]): Promise<void>
+  /** Interroge l'Active Directory pour suggerer le prochain nom de machine libre. */
+  suggestComputerName(request: SuggestComputerNameRequest): Promise<SuggestComputerNameResult>
 }
